@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { ref, onMounted, nextTick } from 'vue'
-import {TonConnectUI} from '@tonconnect/ui'
+import {TonConnect} from '@tonconnect/sdk'
 import { toUserFriendlyAddress } from '@tonconnect/sdk';
 import { Address } from 'ton3-core';
 import QRCodeStyling from './QRCodeStyling.vue';
-
+import TonWeb from 'tonweb';
 import { ConnectedWalletFromAPI, useWalletStore } from '../stores'
 
 const store = useWalletStore()
@@ -34,30 +34,45 @@ async function postData(url = "", data = {}) {
 
 
 const connect = async (wallets: 'tonkeeper' | 'tonhub') => {
-  // const rawAddress = store.entity.connector.wallet.account.address; // like '0:abcdef123456789...'
   // console.log(new Address(rawAddress).toString('base64', { bounceable: true }));
   const d = await postData('https://ton-dapp-backend.systemdesigndao.xyz/ton-proof/generatePayload');
   const { payload } = await d.json();
-
-  if (store?.entity?.connector.connected) {
-    await store.entity.connector.disconnect();
-  }
     
-  const link = store.entity?.connector.connect(walletConnectionSource[wallets], { tonProof: payload });
+  const link = store.entity?.connect(walletConnectionSource[wallets], { tonProof: payload });
 
   store.setConnecting({
     link,
   })
 }
 
-onMounted(() => {
-  const tonConnectUI = new TonConnectUI({
+const sendTx = async () => {
+  const transaction = {
+      validUntil: Date.now() + 1000000,
+      messages: [
+          {
+            address: store.wallet?.address.raw!,
+            amount: "60000000", 
+          }
+      ]
+  }
+
+  try {
+      const result = await store.entity?.sendTransaction(transaction);
+
+      alert('Transaction was sent successfully');
+  } catch (e) {
+      console.error(e);
+  }
+}
+
+onMounted(() => {  
+  const tonConnect = new TonConnect({
     manifestUrl: 'https://about.systemdesigndao.xyz/ton-connect.manifest.json',
   });
 
-  store.setEntity(tonConnectUI);
+  store.setEntity(tonConnect);
 
-  const unsubscribe = tonConnectUI.onStatusChange(async wallet => {
+  const unsubscribe = tonConnect.onStatusChange(async wallet => {
 			if (!wallet) {
 				return;
 			}
@@ -100,12 +115,13 @@ const { wallet, connecting } = storeToRefs(store)
 </script>
 
 <template>
-  <div v-if="wallet === undefined">
-    <button  @click="connect('tonkeeper')">Connect tonkeeper</button>
-    <button  @click="connect('tonhub')">Connect tonhub</button>
+  <div v-if="wallet === undefined" style="display: flex; flex-direction: column;">
+    <button @click="connect('tonkeeper')">Connect tonkeeper</button>
+    <button @click="connect('tonhub')">Connect tonhub</button>
     <QRCodeStyling v-if="connecting?.link" :text="connecting.link" />
   </div>
   <div v-else>
     <pre>{{wallet}}</pre>
+    <button @click="sendTx">Send tx</button>
   </div>
 </template>

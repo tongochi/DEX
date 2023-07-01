@@ -1,4 +1,4 @@
-import { TonConnectUI } from '@tonconnect/ui';
+import { TonConnect } from '@tonconnect/ui';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
   
@@ -15,7 +15,7 @@ export interface ConnectedWalletFromAPI {
 }
 
 type State = {
-  entity?: TonConnectUI;
+  entity?: TonConnect;
   wallet?: ConnectedWalletFromAPI;
   connecting?: {
     link?: string;
@@ -27,7 +27,7 @@ export const useWalletStore = defineStore('wallet', () => {
     const wallet = ref<State['wallet']>(undefined);
     const connecting = ref<State['connecting']>(undefined);
 
-    function setEntity(payload: TonConnectUI) {
+    function setEntity(payload: TonConnect) {
       entity.value = payload;
     };
 
