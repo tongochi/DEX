@@ -83,7 +83,7 @@ const sendTx = async () => {
           messages: [
               {
                 address: params.to.toString(),
-                amount: params.gasAmount,
+                amount: (params.gasAmount.toNumber() * 2).toString(),
                 payload: bytesToBase64(await params.payload.toBoc()),
               }
           ]
