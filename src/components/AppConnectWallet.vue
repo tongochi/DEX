@@ -1,18 +1,14 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { ref, onMounted, nextTick } from 'vue'
+import { onMounted } from 'vue'
 import {TonConnect} from '@tonconnect/sdk'
-import { toUserFriendlyAddress } from '@tonconnect/sdk';
-import { Address, Coins } from 'ton3-core';
 import QRCodeStyling from './QRCodeStyling.vue';
 import TonWeb from 'tonweb';
 import { ConnectedWalletFromAPI, useWalletStore } from '../stores'
 import { Router, ROUTER_REVISION, ROUTER_REVISION_ADDRESS } from '@ston-fi/sdk';
-import { bytesToBase64, bytesToHex } from 'ton3-core/dist/utils/helpers';
+import { bytesToBase64 } from 'ton3-core/dist/utils/helpers';
 
 const store = useWalletStore()
-
-defineProps<{ anyProp: string }>()
 
 const walletConnectionSource = {
   tonkeeper: {
@@ -47,14 +43,19 @@ const connect = async (wallets: 'tonkeeper' | 'tonhub') => {
   })
 }
 
-const sendTx = async () => {
+const jettons = [
+  { name: 'jusdt', addressBouncable: 'EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA' },
+  { name: 'jusdc', addressBouncable: 'EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728' },
+];
+
+const swapJettons = async () => {
   try {
       const WALLET_ADDRESS = store.wallet?.address.bounceable!; // YOUR WALLET ADDRESS
 
       const REFERRAL_ADDRESS = undefined; // REFERRAL ADDRESS (OPTIONAL)
 
-      const JETTON0 = 'EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA'; // JUSDT
-      const JETTON1 = 'EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728'; // JUSDC
+      const JETTON0 = jettons[0].addressBouncable;
+      const JETTON1 = jettons[1].addressBouncable;
 
       const provider = new TonWeb.HttpProvider(undefined, { apiKey: import.meta.env.VITE_TON_HTTP_API_KEY });
 
@@ -91,7 +92,7 @@ const sendTx = async () => {
 
       const result = await store.entity?.sendTransaction(transaction);
 
-      alert('Transaction was sent successfully');
+      console.log('Transaction was sent successfully', result);
   } catch (e) {
       console.error(e);
   }
@@ -154,6 +155,6 @@ const { wallet, connecting } = storeToRefs(store)
   </div>
   <div v-else>
     <pre>{{wallet}}</pre>
-    <button @click="sendTx">Send tx</button>
+    <button @click="swapJettons">Swap jettons (jUSDT -> jUSDC)</button>
   </div>
 </template>

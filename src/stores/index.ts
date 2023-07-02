@@ -1,4 +1,4 @@
-import { TonConnect } from '@tonconnect/ui';
+import { TonConnect } from '@tonconnect/sdk';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
   
