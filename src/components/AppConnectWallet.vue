@@ -56,7 +56,7 @@ const sendTx = async () => {
       const JETTON0 = 'EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA'; // JUSDT
       const JETTON1 = 'EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728'; // JUSDC
 
-      const provider = new TonWeb.HttpProvider(undefined, { apiKey: import.meta.env.TON_HTTP_API_KEY });
+      const provider = new TonWeb.HttpProvider(undefined, { apiKey: import.meta.env.VITE_TON_HTTP_API_KEY });
 
       const router = new Router(provider, {
         revision: ROUTER_REVISION.V1,
