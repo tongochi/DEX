@@ -148,10 +148,14 @@ const { wallet, connecting } = storeToRefs(store)
 </script>
 
 <template>
-  <div v-if="wallet === undefined" style="display: flex; flex-direction: column;">
-    <button @click="connect('tonkeeper')">Connect tonkeeper</button>
-    <button @click="connect('tonhub')">Connect tonhub</button>
-    <QRCodeStyling v-if="connecting?.link" :text="connecting.link" />
+  <div v-if="wallet === undefined" class="p-1">
+    <div class="flex justify-center">
+      <button class=" bg-main-light-4 w-40 h-10 rounded-full font-sans border-none" @click="connect('tonkeeper')"><span class="text-white-1">Connect tonkeeper</span></button>
+      <button class=" bg-main-light-4 w-40 h-10 rounded-full font-sans border-none ml-1" @click="connect('tonhub')"><span class="text-white-1">Connect tonhub</span></button>
+    </div>
+    <div class="flex justify-center">
+      <QRCodeStyling v-if="connecting?.link" :text="connecting.link" />
+    </div>
   </div>
   <div v-else>
     <pre>{{wallet}}</pre>
