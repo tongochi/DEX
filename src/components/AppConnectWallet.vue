@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { onMounted, watchEffect, watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import {TonConnect} from '@tonconnect/sdk'
 import QRCodeStyling from './QRCodeStyling.vue';
 import TonWeb from 'tonweb';
@@ -161,9 +161,12 @@ watch(() => store?.entity?.connected, async () => {
   }
 
   if (store?.entity?.connected === true) {
-    const data = JSON.parse(localStorage.getItem('wallet'));
-    store.setWallet(data);
-    store.setLoading(false);
+    const localWallet = localStorage.getItem('wallet');
+    if (localWallet) {
+      const data = JSON.parse(localWallet);
+      store.setWallet(data);
+      store.setLoading(false);
+    }
   }
 })
 
