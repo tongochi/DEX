@@ -33,7 +33,7 @@ export const useWalletStore = defineStore('wallet', () => {
       entity.value = payload;
     };
 
-    function setWallet(payload: ConnectedWalletFromAPI) {
+    function setWallet(payload?: ConnectedWalletFromAPI) {
       wallet.value = payload;
     };
 
