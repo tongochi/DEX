@@ -19,13 +19,15 @@ type State = {
   wallet?: ConnectedWalletFromAPI;
   connecting?: {
     link?: string;
-  }
+  };
+  loading?: boolean;
 }
 
 export const useWalletStore = defineStore('wallet', () => {
     const entity = ref<State['entity']>(undefined);
     const wallet = ref<State['wallet']>(undefined);
     const connecting = ref<State['connecting']>(undefined);
+    const loading = ref<State['loading']>(localStorage.getItem('wallet') ? true : false);
 
     function setEntity(payload: TonConnect) {
       entity.value = payload;
@@ -41,12 +43,18 @@ export const useWalletStore = defineStore('wallet', () => {
       };
     };
 
+    function setLoading(payload: State['loading']) {
+      loading.value = payload;
+    };
+
     return {
       entity,
       wallet,
       connecting,
+      loading,
       setEntity,
       setWallet,
       setConnecting,
+      setLoading,
     }
   });
