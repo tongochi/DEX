@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { onMounted } from 'vue'
+import { onMounted, watchEffect, watch } from 'vue'
 import {TonConnect} from '@tonconnect/sdk'
 import QRCodeStyling from './QRCodeStyling.vue';
 import TonWeb from 'tonweb';
@@ -47,6 +47,14 @@ const jettons = [
   { name: 'jusdt', addressBouncable: 'EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA' },
   { name: 'jusdc', addressBouncable: 'EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728' },
 ];
+
+const disconnect = async () => {
+  if (store?.entity?.connected) {
+      await store?.entity?.disconnect();
+      store.setWallet(undefined);
+      localStorage.removeItem('wallet');
+  }
+}
 
 const swapJettons = async () => {
   try {
@@ -98,7 +106,7 @@ const swapJettons = async () => {
   }
 }
 
-onMounted(() => {  
+onMounted(async () => {  
   const tonConnect = new TonConnect({
     manifestUrl: 'https://about.systemdesigndao.xyz/ton-connect.manifest.json',
   });
@@ -130,6 +138,9 @@ onMounted(() => {
                       'Content-Type': 'application/json',
                     }
             })).json() as ConnectedWalletFromAPI;
+
+            localStorage.setItem('wallet', JSON.stringify(data));
+
             store.setWallet(data);
           } catch (err) {
             console.error(err);
@@ -144,21 +155,39 @@ onMounted(() => {
   return unsubscribe;
 })
 
-const { wallet, connecting } = storeToRefs(store)
+watch(() => store?.entity?.connected, async () => {
+  if (store?.entity?.connected === false) {
+    store.entity.restoreConnection();
+  }
+
+  if (store?.entity?.connected === true) {
+    const data = JSON.parse(localStorage.getItem('wallet'));
+    store.setWallet(data);
+    store.setLoading(false);
+  }
+})
+
+const { wallet, connecting, loading } = storeToRefs(store)
 </script>
 
 <template>
-  <div v-if="wallet === undefined" class="p-1">
-    <div class="flex justify-center">
-      <button class=" bg-main-light-4 w-40 h-10 rounded-full font-sans border-none" @click="connect('tonkeeper')"><span class="text-white-1">Connect tonkeeper</span></button>
-      <button class=" bg-main-light-4 w-40 h-10 rounded-full font-sans border-none ml-1" @click="connect('tonhub')"><span class="text-white-1">Connect tonhub</span></button>
+  <div v-if="loading === false">
+    <div v-if="wallet === undefined" class="p-1">
+      <div class="flex justify-center">
+        <button class=" bg-main-light-4 w-40 h-10 rounded-full font-sans border-none" @click="connect('tonkeeper')"><span class="text-white-1">Connect tonkeeper</span></button>
+        <button class=" bg-main-light-4 w-40 h-10 rounded-full font-sans border-none ml-1" @click="connect('tonhub')"><span class="text-white-1">Connect tonhub</span></button>
+      </div>
+      <div class="flex justify-center">
+        <QRCodeStyling v-if="connecting?.link" :text="connecting.link" />
+      </div>
     </div>
-    <div class="flex justify-center">
-      <QRCodeStyling v-if="connecting?.link" :text="connecting.link" />
+    <div v-else class="flex flex-col">
+      <pre>{{wallet}}</pre>
+      <button @click="swapJettons">Swap jettons (jUSDT -> jUSDC)</button>
+      <button @click="disconnect">Disconnect</button>
     </div>
   </div>
-  <div v-else>
-    <pre>{{wallet}}</pre>
-    <button @click="swapJettons">Swap jettons (jUSDT -> jUSDC)</button>
+  <div v-else class="flex justify-center items-center h-screen">
+    loading wallet state...
   </div>
 </template>

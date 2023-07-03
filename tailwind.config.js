@@ -1,7 +1,5 @@
 const {tdsTheme} = require('@designervoid/ton-design-system/lib');
 
-console.log(tdsTheme);
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
