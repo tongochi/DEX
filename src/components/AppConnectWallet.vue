@@ -33,6 +33,10 @@ async function postData(url = "", data = {}) {
 
 const connect = async (wallets: 'tonkeeper' | 'tonhub') => {
   // console.log(new Address(rawAddress).toString('base64', { bounceable: true }));
+  // fcking hell but okey
+  if (store?.entity?.connected) {
+      await store?.entity?.disconnect();
+  }
   const d = await postData('https://ton-dapp-backend.systemdesigndao.xyz/ton-proof/generatePayload');
   const { payload } = await d.json();
     
