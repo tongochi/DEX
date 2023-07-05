@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { onMounted, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import {TonConnect} from '@tonconnect/sdk'
 import QRCodeStyling from './QRCodeStyling.vue';
 import TonWeb from 'tonweb';
 import { ConnectedWalletFromAPI, useWalletStore } from '../stores'
 import { Router, ROUTER_REVISION, ROUTER_REVISION_ADDRESS } from '@ston-fi/sdk';
 import { bytesToBase64 } from 'ton3-core/dist/utils/helpers';
+import { Coins } from 'ton3-core';
 
 const store = useWalletStore()
+
+const usdToSton = ref('');
+const stonToUsd = ref('');
 
 const walletConnectionSource = {
   tonkeeper: {
@@ -49,7 +53,7 @@ const connect = async (wallets: 'tonkeeper' | 'tonhub') => {
 
 const jettons = [
   { name: 'jusdt', addressBouncable: 'EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA' },
-  { name: 'jusdc', addressBouncable: 'EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728' },
+  { name: 'ston', addressBouncable: 'EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO' },
 ];
 
 const disconnect = async () => {
@@ -60,14 +64,14 @@ const disconnect = async () => {
   }
 }
 
-const swapJettons = async () => {
+const swapJettons = async (leftJetton: string, rightJetton: string, amount: string) => {
   try {
       const WALLET_ADDRESS = store.wallet?.address.bounceable!; // YOUR WALLET ADDRESS
 
       const REFERRAL_ADDRESS = undefined; // REFERRAL ADDRESS (OPTIONAL)
 
-      const JETTON0 = jettons[0].addressBouncable;
-      const JETTON1 = jettons[1].addressBouncable;
+      const JETTON0 = leftJetton;
+      const JETTON1 = rightJetton;
 
       const provider = new TonWeb.HttpProvider(undefined, { apiKey: import.meta.env.VITE_TON_HTTP_API_KEY });
 
@@ -82,8 +86,9 @@ const swapJettons = async () => {
         userWalletAddress: WALLET_ADDRESS,
         offerJettonAddress: JETTON0,
         askJettonAddress: JETTON1,
-        offerAmount: new TonWeb.utils.BN(1e6),
-        minAskAmount: new TonWeb.utils.BN(1e6),
+        // 1000000, 1e6 - 1 TON for jUSDT
+        offerAmount: amount,
+        minAskAmount: amount,
         queryId: 12345,
 
         // Set your address if you want to give referral payouts
@@ -175,6 +180,16 @@ watch(() => store?.entity?.connected, async () => {
 })
 
 const { wallet, connecting, loading } = storeToRefs(store)
+
+function isNumber(evt: any) {
+      evt = (evt) ? evt : window.event;
+      var charCode = (evt.which) ? evt.which : evt.keyCode;
+      if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+        evt.preventDefault();;
+      } else {
+        return true;
+      }
+}
 </script>
 
 <template>
@@ -190,7 +205,14 @@ const { wallet, connecting, loading } = storeToRefs(store)
     </div>
     <div v-else class="flex flex-col">
       <pre>{{wallet}}</pre>
-      <button @click="swapJettons">Swap jettons (jUSDT -> jUSDC)</button>
+      <div class="flex flex-col justify-center">
+        <input v-model="usdToSton" type="number" @keypress="isNumber" />
+        <button @click="swapJettons(jettons[0].addressBouncable, jettons[1].addressBouncable, (Number(usdToSton) * 1e6).toString())">Swap jettons ({{usdToSton}} jUSDT -> STON)</button>
+      </div>
+      <div class="flex flex-col justify-center">
+        <input v-model="stonToUsd" type="number" @keypress="isNumber" />
+        <button @click="swapJettons(jettons[1].addressBouncable, jettons[0].addressBouncable, new Coins(stonToUsd).toNano())">Swap jettons ({{stonToUsd}} STON -> jUSDT)</button>
+      </div>
       <button @click="disconnect">Disconnect</button>
     </div>
   </div>
