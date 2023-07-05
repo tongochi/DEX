@@ -203,17 +203,19 @@ function isNumber(evt: any) {
         <QRCodeStyling v-if="connecting?.link" :text="connecting.link" />
       </div>
     </div>
-    <div v-else class="flex flex-col">
+    <div v-else class="flex flex-col p-1">
       <pre>{{wallet}}</pre>
-      <div class="flex flex-col justify-center">
-        <input v-model="usdToSton" type="number" @keypress="isNumber" />
-        <button @click="swapJettons(jettons[0].addressBouncable, jettons[1].addressBouncable, (Number(usdToSton) * 1e6).toString())">Swap jettons ({{usdToSton}} jUSDT -> STON)</button>
+      <div class="flex flex-col justify-center mt-2">
+        <input v-model="usdToSton" type="number" @keypress="isNumber" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+        <button @click="swapJettons(jettons[0].addressBouncable, jettons[1].addressBouncable, (Number(usdToSton) * 1e6).toString())" class="text-white-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Swap jettons ({{usdToSton}} jUSDT -> STON)</button>
       </div>
-      <div class="flex flex-col justify-center">
-        <input v-model="stonToUsd" type="number" @keypress="isNumber" />
-        <button @click="swapJettons(jettons[1].addressBouncable, jettons[0].addressBouncable, new Coins(stonToUsd).toNano())">Swap jettons ({{stonToUsd}} STON -> jUSDT)</button>
+      <div class="flex flex-col justify-center mt-2">
+        <input v-model="stonToUsd" type="number" @keypress="isNumber" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+        <button @click="swapJettons(jettons[1].addressBouncable, jettons[0].addressBouncable, new Coins(stonToUsd).toNano())" class="text-white-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Swap jettons ({{stonToUsd}} STON -> jUSDT)</button>
       </div>
-      <button @click="disconnect">Disconnect</button>
+      <div class="flex justify-center mt-1.5">
+        <button @click="disconnect" class="w-full text-white-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Disconnect</button>
+      </div>
     </div>
   </div>
   <div v-else class="flex justify-center items-center h-screen">
