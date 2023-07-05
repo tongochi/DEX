@@ -88,7 +88,7 @@ const swapJettons = async (leftJetton: string, rightJetton: string, amount: stri
         askJettonAddress: JETTON1,
         // 1000000, 1e6 - 1 TON for jUSDT
         offerAmount: amount,
-        minAskAmount: amount,
+        minAskAmount: 0,
         queryId: 12345,
 
         // Set your address if you want to give referral payouts
@@ -101,7 +101,7 @@ const swapJettons = async (leftJetton: string, rightJetton: string, amount: stri
           messages: [
               {
                 address: params.to.toString(),
-                amount: (params.gasAmount.toNumber() * 2).toString(),
+                amount: params.gasAmount.add(TonWeb.utils.toNano('0.2')),
                 payload: bytesToBase64(await params.payload.toBoc()),
               }
           ]
