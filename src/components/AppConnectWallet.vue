@@ -52,8 +52,8 @@ const connect = async (wallets: 'tonkeeper' | 'tonhub') => {
 }
 
 const jettons = [
-  { name: 'jusdt', addressBouncable: 'EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA' },
-  { name: 'ston', addressBouncable: 'EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO' },
+  { name: 'jusdt', addressMinterBouncable: 'EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA', addressMinterRaw: '0:729C13B6DF2C07CBF0A06AB63D34AF454F3D320EC1BCD8FB5C6D24D0806A17C2' },
+  { name: 'ston', addressMinterBouncable: 'EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO', addressMinterRaw: '0:3690254DC15B2297610CDA60744A45F2B710AA4234B89ADB630E99D79B01BD4F' },
 ];
 
 const disconnect = async () => {
@@ -115,7 +115,7 @@ const swapJettons = async (leftJetton: string, rightJetton: string, amount: stri
   }
 }
 
-onMounted(async () => {  
+onMounted(async () => {
   const tonConnect = new TonConnect({
     manifestUrl: 'https://about.systemdesigndao.xyz/ton-connect.manifest.json',
   });
@@ -207,11 +207,11 @@ function isNumber(evt: any) {
       <pre>{{wallet}}</pre>
       <div class="flex flex-col justify-center mt-2">
         <input v-model="usdToSton" type="number" @keypress="isNumber" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-        <button @click="swapJettons(jettons[0].addressBouncable, jettons[1].addressBouncable, (Number(usdToSton) * 1e6).toString())" class="text-white-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Swap jettons ({{usdToSton}} jUSDT -> STON)</button>
+        <button @click="swapJettons(jettons[0].addressMinterBouncable, jettons[1].addressMinterBouncable, (Number(usdToSton) * 1e6).toString())" class="text-white-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Swap jettons ({{usdToSton}} jUSDT -> STON)</button>
       </div>
       <div class="flex flex-col justify-center mt-2">
         <input v-model="stonToUsd" type="number" @keypress="isNumber" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-        <button @click="swapJettons(jettons[1].addressBouncable, jettons[0].addressBouncable, new Coins(stonToUsd).toNano())" class="text-white-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Swap jettons ({{stonToUsd}} STON -> jUSDT)</button>
+        <button @click="swapJettons(jettons[1].addressMinterBouncable, jettons[0].addressMinterBouncable, new Coins(stonToUsd).toNano())" class="text-white-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Swap jettons ({{stonToUsd}} STON -> jUSDT)</button>
       </div>
       <div class="flex justify-center mt-1.5">
         <button @click="disconnect" class="w-full text-white-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Disconnect</button>
