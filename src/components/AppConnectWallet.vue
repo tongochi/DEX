@@ -6,8 +6,8 @@ import QRCodeStyling from './QRCodeStyling.vue';
 import TonWeb from 'tonweb';
 import { ConnectedWalletFromAPI, useWalletStore } from '../stores'
 import { Router, ROUTER_REVISION, ROUTER_REVISION_ADDRESS } from '@ston-fi/sdk';
-import { bytesToBase64 } from 'ton3-core/dist/utils/helpers';
-import { Coins } from 'ton3-core';
+import { bytesToBase64, uintToHex } from 'ton3-core/dist/utils/helpers';
+import { BOC, Coins, Slice } from 'ton3-core';
 
 const store = useWalletStore()
 
@@ -115,7 +115,56 @@ const swapJettons = async (leftJetton: string, rightJetton: string, amount: stri
   }
 }
 
+enum JettonOps {
+    TRANSFER = '0xf8a7ea5',
+    TRANSFER_NOTIFICATION = '0x7362d09c',
+    INTERNAL_TRANSFER = '0x178d4519',
+    EXCESSES = '0xd53276db',
+    BURN = '0x595f07bc',
+    BURN_NOTIFICATION = '0x7bdd97de',
+}
+
+const loadTransferNotification = (body: Slice, payload: { opUint32Hex: string }) => {
+    const queryId = body.loadBigUint(64);
+    const jettonAmount = body.loadCoins();
+    const from = body.loadAddress();
+    const forwardPayload = body.loadBit() ? Slice.parse(body.loadRef()) : body;
+
+    return {
+      ...payload,
+      queryId,
+      jettonAmount,
+      from,
+      forwardPayload,
+    };
+};
+          
+const parseBocBase64 = (bocBase64: string) => {
+  // 0x7362d09c - jetton transfer notification
+  const [ deserialized ] = BOC.from(bocBase64);
+  const slice = deserialized.slice();
+  const opUint32 = slice.loadUint(32);
+  const opUint32Hex = `0x${uintToHex(opUint32)}`;
+  console.log(opUint32, opUint32Hex);
+
+  if (opUint32Hex === JettonOps.TRANSFER) {
+
+    const queryId = slice.loadBigUint(64);
+    const amount = slice.loadCoins();
+
+    console.log(queryId, amount);
+  }
+
+  if (opUint32Hex === JettonOps.TRANSFER_NOTIFICATION) {
+    console.log(loadTransferNotification(slice, { opUint32Hex }))
+  }
+}
+
 onMounted(async () => {
+  parseBocBase64('te6ccuEBAQEADgAcABjVMnbbAAAjjN/pQ8OUt8hp');
+  parseBocBase64('te6ccuEBAQEANQBqAGZzYtCcAAAjjN/pQ8NQmasQyAgAcx8ShmRebO0RtS6aLAfKsNbqQjkLW5af0gSg4DEpTNB4dPjD')
+  parseBocBase64('te6ccuECAgEAAIcAAKIBDgGcsbvyF40AJ2UWV0N7lpkTAdb95TxFNxE9HIjlqdHz4aWCR2O824iiD8udFrK3g1yK0sey6Cp0sHXOSza+HqKlBympoxdkp8BPAAABzAADAQBoYgAcx8ShmRebO0RtS6aLAfKsNbqQjkLW5af0gSg4DEpTNCAhYOwAAAAAAAAAAAAAAAAAAApFK8Y=');
+
   const tonConnect = new TonConnect({
     manifestUrl: 'https://about.systemdesigndao.xyz/ton-connect.manifest.json',
   });
@@ -222,3 +271,11 @@ function isNumber(evt: any) {
     loading wallet state...
   </div>
 </template>
+
+<style scoped>
+.header {
+  width: 87.5625rem;
+  height: 3.4375rem;
+  flex-shrink: 0;
+}
+</style>
