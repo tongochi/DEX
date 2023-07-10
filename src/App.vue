@@ -288,11 +288,11 @@ function isNumber(evt: any) {
             </div>
             <div class="w-full mt-[0rem] mb-[1.25rem] flex justify-between">
               <div class="flex flex-col flex-1">
-                  <span class="text-[0.875rem] text-[#797979]">
+                  <span class="text-[0.875rem] text-[#797979] tracking-[-0.04375rem] leading-normal not-italic">
                     You sell
                   </span>
                   <div class="flex items-center mt-[0.25rem]">
-                    <span class="text-[0.875rem] text-[#F9F9F9]">
+                    <span class="text-[1.125rem] text-[#F9F9F9] tracking-[-0.05625rem] leading-normal not-italic">
                       $PET
                     </span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -302,11 +302,11 @@ function isNumber(evt: any) {
                 </div>
               <div>
                 <div class="flex flex-col flex-1 justify-end">
-                  <span class="text-[0.875rem] text-[#797979] text-right">
+                  <span class="text-[0.875rem] text-[#797979] text-right tracking-[-0.04375rem] leading-normal not-italic font-normal">
                     0
                   </span>
                   <div class="flex items-center mt-[0.25rem]">
-                    <span class="text-[0.875rem] text-[#F9F9F9] text-right">
+                    <span class="text-[1.5rem] text-[#F9F9F9] text-right tracking-[-0.075rem] leading-normal not-italic font-normal">
                       0.00
                     </span>
                     </div>
@@ -314,7 +314,8 @@ function isNumber(evt: any) {
                 </div>
               <div>
             </div>
-        </div>
+          </div>
+          <div class="w-full mt-[0.81rem] mb-[0.94rem] w-full h-[0.0625rem] bg-[#797979]"></div>
           </div>
         </div>
         <!-- <pre class="text-white-1">{{wallet}}</pre> -->
@@ -338,9 +339,5 @@ function isNumber(evt: any) {
 </template>
 
 <style scoped>
-.header {
-  width: 87.5625rem;
-  height: 3.4375rem;
-  flex-shrink: 0;
-}
+
 </style>
