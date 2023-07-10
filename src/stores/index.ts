@@ -59,6 +59,9 @@ export const useWalletStore = defineStore('wallet', () => {
 
     function hideConnectWalletModalFn() {
       setShowConnectWalletModal(false);
+      setConnecting({
+        link: undefined,
+      })
     };
 
     return {
