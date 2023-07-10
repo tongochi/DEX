@@ -3,5 +3,9 @@ import AppConnectWallet from './components/AppConnectWallet.vue'
 </script>
 
 <template>
-  <AppConnectWallet />
+  <main class="bg-[#0F0F0F] h-screen">
+    <header class="">
+      <AppConnectWallet />
+    </header>
+  </main>
 </template>
