@@ -269,7 +269,7 @@ function isNumber(evt: any) {
         <div class="w-full mt-[5.31rem] mb-[1.25rem]">
           <div class="max-w-[28.1875rem] h-[19.1875rem] mx-auto">
             <div class="flex justify-between h-[3.75rem] items-center">
-              <span class="text-[#CDFD51] text-[1.5625rem]">
+              <span class="text-[#CDFD51] text-[1.5625rem] tracking-[-0.0625rem] leading-[3.75rem] font-normal">
                 Swap tokens
               </span>
               <div class="flex">
