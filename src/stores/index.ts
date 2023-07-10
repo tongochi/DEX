@@ -21,6 +21,7 @@ type State = {
     link?: string;
   };
   loading?: boolean;
+  connectWalletModal?: boolean;
 }
 
 export const useWalletStore = defineStore('wallet', () => {
@@ -28,6 +29,7 @@ export const useWalletStore = defineStore('wallet', () => {
     const wallet = ref<State['wallet']>(undefined);
     const connecting = ref<State['connecting']>(undefined);
     const loading = ref<State['loading']>(localStorage.getItem('wallet') ? true : false);
+    const showConnectWalletModal = ref<State['connectWalletModal']>(false);
 
     function setEntity(payload: TonConnect) {
       entity.value = payload;
@@ -47,6 +49,18 @@ export const useWalletStore = defineStore('wallet', () => {
       loading.value = payload;
     };
 
+    function setShowConnectWalletModal(payload: State['connectWalletModal']) {
+      showConnectWalletModal.value = payload;
+    };
+
+    function showConnectWalletModalFn() {
+      setShowConnectWalletModal(true);
+    };
+
+    function hideConnectWalletModalFn() {
+      setShowConnectWalletModal(false);
+    };
+
     return {
       entity,
       wallet,
@@ -56,5 +70,8 @@ export const useWalletStore = defineStore('wallet', () => {
       setWallet,
       setConnecting,
       setLoading,
+      showConnectWalletModal,
+      showConnectWalletModalFn,
+      hideConnectWalletModalFn,
     }
   });

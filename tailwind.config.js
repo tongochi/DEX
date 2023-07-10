@@ -7,7 +7,12 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx,vue}",
   ],
   theme: {
-    extend: tdsTheme,
+    extend: {
+      ...tdsTheme,
+      fontFamily: {
+        sans: ['Orbitron'],
+      },
+    },
   },
   plugins: [],
 };

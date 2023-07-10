@@ -7,7 +7,9 @@ import TonWeb from 'tonweb';
 import { ConnectedWalletFromAPI, useWalletStore } from '../stores'
 import { Router, ROUTER_REVISION, ROUTER_REVISION_ADDRESS } from '@ston-fi/sdk';
 import { bytesToBase64, uintToHex } from 'ton3-core/dist/utils/helpers';
-import { BOC, Coins, Slice } from 'ton3-core';
+import { Address, BOC, Coins, Slice } from 'ton3-core';
+import AppExtraButton from './AppExtraButton.vue'
+import AppModal from './AppModal.vue'
 
 const store = useWalletStore()
 
@@ -158,12 +160,51 @@ const parseBocBase64 = (bocBase64: string) => {
   if (opUint32Hex === JettonOps.TRANSFER_NOTIFICATION) {
     console.log(loadTransferNotification(slice, { opUint32Hex }))
   }
+
+  if (opUint32Hex === JettonOps.EXCESSES) {
+    console.log('exc');
+    const queryId = slice.loadBigUint(64);
+    console.log(queryId);
+  }
 }
 
 onMounted(async () => {
-  parseBocBase64('te6ccuEBAQEADgAcABjVMnbbAAAjjN/pQ8OUt8hp');
-  parseBocBase64('te6ccuEBAQEANQBqAGZzYtCcAAAjjN/pQ8NQmasQyAgAcx8ShmRebO0RtS6aLAfKsNbqQjkLW5af0gSg4DEpTNB4dPjD')
-  parseBocBase64('te6ccuECAgEAAIcAAKIBDgGcsbvyF40AJ2UWV0N7lpkTAdb95TxFNxE9HIjlqdHz4aWCR2O824iiD8udFrK3g1yK0sey6Cp0sHXOSza+HqKlBympoxdkp8BPAAABzAADAQBoYgAcx8ShmRebO0RtS6aLAfKsNbqQjkLW5af0gSg4DEpTNCAhYOwAAAAAAAAAAAAAAAAAAApFK8Y=');
+  console.log(new Address('EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO').toString('raw')); // ston
+  console.log(new Address('EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA').toString('raw')); // jusdt
+
+  const t = [
+      {
+        "value": "te6ccuEBAQEADgAcABjVMnbbAAAjjN/pQ8OUt8hp"
+      },
+      {
+        "value": "te6ccuEBAQEANQBqAGZzYtCcAAAjjN/pQ8NQmasQyAgAcx8ShmRebO0RtS6aLAfKsNbqQjkLW5af0gSg4DEpTNB4dPjD"
+      },
+      {
+        "value": "te6ccuECAgEAAIcAAKIBDgGcsbvyF40AJ2UWV0N7lpkTAdb95TxFNxE9HIjlqdHz4aWCR2O824iiD8udFrK3g1yK0sey6Cp0sHXOSza+HqKlBympoxdkp8BPAAABzAADAQBoYgAcx8ShmRebO0RtS6aLAfKsNbqQjkLW5af0gSg4DEpTNCAhYOwAAAAAAAAAAAAAAAAAAApFK8Y="
+      },
+      {
+        "value": "te6ccuEBAQEADgAcABjVMnbbAAAAAAAAMDkRbQJP"
+      },
+      {
+        "value": "te6ccuECAwEAAQkAAKIBfgISAZxuyoebGfZ8VzQxmyLY+6Oo2rpK18db4nkdZrmefxPrZFc/gN3BkihD30iN0Kd042EItJTJrQPP/9yR20Ub+9gHKamjF2SloxkAAAHLAAMBAdViAEEnePzvnrqta5YU7cinRN3z8ZRMnEoV9MC37fAb1kQDoO5rKAAAAAAAAAAAAAAAAAAAD4p+pQAAAAAAADA5Q7msoAgA7zuZAqJxsqAciTilI8/iTnGEeq62piAAHtRKd6wOcJwQPy5RAwIAjyWThWGAApWA5YrFIkZa+bJ7vYJARri8uevEBP6Td4tUTty6RJsBACy/jkW+aeL88vemIpoefVf/8+hTSg/CQ6wpZifdJdDUUHgZZmo="
+      },
+      {
+        "value": "te6ccuEBAQEADgAcABjVMnbbAAAAAAAAMDkRbQJP"
+      },
+      {
+        "value": "te6ccuECAwEAAQkAAKIBfgISAZz9bCinap+6c7eTfDZgllrnln8kh4WJMDktj2xgCFtAopyo79YwlyTNV0WPrkJUbfiPwPFJ3KwxR9KkhOouE4QCKamjF2SloBwAAAHKAAMBAdViAEEnePzvnrqta5YU7cinRN3z8ZRMnEoV9MC37fAb1kQDoO5rKAAAAAAAAAAAAAAAAAAAD4p+pQAAAAAAADA5Q7msoAgA7zuZAqJxsqAciTilI8/iTnGEeq62piAAHtRKd6wOcJwQPy5RAwIAjyWThWGAApWA5YrFIkZa+bJ7vYJARri8uevEBP6Td4tUTty6RJsBACy/jkW+aeL88vemIpoefVf/8+hTSg/CQ6wpZifdJdDUUGtul2o="
+      }
+    ];
+
+  parseBocBase64(t[0].value); // cashback
+  parseBocBase64(t[1].value); // token recieved, 41.25 SCALE
+  parseBocBase64(t[2].value); // receive 41.25 SCALE
+
+  parseBocBase64(t[3].value); // cashback
+  parseBocBase64(t[4].value); // 1 STON to 1 jUSDT
+
+  parseBocBase64(t[5].value); // cashback
+  parseBocBase64(t[6].value); // 1 STON to 1 jUSDT
 
   const tonConnect = new TonConnect({
     manifestUrl: 'https://about.systemdesigndao.xyz/ton-connect.manifest.json',
@@ -244,16 +285,25 @@ function isNumber(evt: any) {
 <template>
   <div v-if="loading === false">
     <div v-if="wallet === undefined" class="p-1">
-      <div class="flex justify-center">
-        <button class=" bg-main-light-4 w-40 h-10 rounded-full font-sans border-none" @click="connect('tonkeeper')"><span class="text-white-1">Connect tonkeeper</span></button>
-        <button class=" bg-main-light-4 w-40 h-10 rounded-full font-sans border-none ml-1" @click="connect('tonhub')"><span class="text-white-1">Connect tonhub</span></button>
-      </div>
-      <div class="flex justify-center">
-        <QRCodeStyling v-if="connecting?.link" :text="connecting.link" />
+      <div class="flex justify-center flex-col">
+        <AppExtraButton text="Connect wallet" :on_click="store.showConnectWalletModalFn" />
+        <AppModal>
+          <template #buttons>
+            <div class="w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px]" @click="connect('tonkeeper')">
+              <span class="text-white-1 flex justify-center items-center h-full">Connect tonkeeper</span>
+            </div>
+            <div class="w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] mt-[18px] cursor-pointer" @click="connect('tonhub')">
+              <span class="text-white-1 flex justify-center items-center h-full">Connect tonhub</span>
+            </div>
+            <div class="flex justify-center mt-4">
+              <QRCodeStyling v-if="connecting?.link" :text="connecting.link" />
+            </div>
+          </template>
+        </AppModal>
       </div>
     </div>
     <div v-else class="flex flex-col p-1">
-      <pre>{{wallet}}</pre>
+      <pre class="text-white-1">{{wallet}}</pre>
       <div class="flex flex-col justify-center mt-2">
         <input v-model="usdToSton" type="number" @keypress="isNumber" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
         <button @click="swapJettons(jettons[0].addressMinterBouncable, jettons[1].addressMinterBouncable, (Number(usdToSton) * 1e6).toString())" class="text-white-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Swap jettons ({{usdToSton}} jUSDT -> STON)</button>

@@ -17,6 +17,8 @@ const store = useWalletStore();
 onMounted(() => {
   qrCodeInstance = new QRCodeStyling({
     data: text,
+    height: 200,
+    width: 200
   });
   qrCode.value && qrCodeInstance.append(qrCode.value);
 });

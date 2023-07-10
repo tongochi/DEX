@@ -8,8 +8,8 @@
   }
 
   @font-face {
-    font-family: 'Mulish';
-    src: local('Mulish'), url('/fonts/Mulish-Regular.ttf') format('truetype');
+    font-family: 'Orbitron';
+    src: local('Orbitron'), url('/fonts/Orbitron-Regular.ttf') format('truetype');
   }
 
   input[type='number']::-webkit-outer-spin-button,
