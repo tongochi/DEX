@@ -54,6 +54,14 @@ export const useJettonStore = defineStore("jettons", () => {
     rightToken.value = payload;
   };
 
+  const leftTokenSwapToRightToken = () => {
+    const left = leftToken.value;
+    const right = rightToken.value;
+
+    leftToken.value = right;
+    rightToken.value = left;
+  };
+
   return {
     entity: readonly(entity),
     leftToken,
@@ -61,5 +69,6 @@ export const useJettonStore = defineStore("jettons", () => {
     findJettonBySymbol,
     leftTokenSet,
     rightTokenSet,
+    leftTokenSwapToRightToken,
   };
 });

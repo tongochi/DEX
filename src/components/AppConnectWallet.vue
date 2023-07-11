@@ -207,8 +207,8 @@ const { connecting } = storeToRefs(store)
 
 <template>
   <div class="flex justify-center flex-col">
-    <AppExtraButton text="Connect wallet" :on_click="storeModals.showConnectWalletModalFn" width="w-[217px]" height="h-[54px]" />
-    <AppModal :show="storeModals.showConnectWalletModal" :close="storeModals.hideConnectWalletModalFn">
+    <AppExtraButton text="Connect wallet" :on_click="storeModals.showConnectWalletModalOpen" width="w-[217px]" height="h-[54px]" />
+    <AppModal :show="storeModals.showConnectWalletModal" :close="storeModals.showConnectWalletModalHide">
       <template #content>
         <span class="text-[#CDFD51] text-left flex w-full pl-[30px] text-[1.5625rem] font-normal">
           Connect wallet

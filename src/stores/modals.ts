@@ -4,47 +4,72 @@ import { useWalletStore } from "./wallet";
 
 type State = {
   connectWalletModal?: boolean;
-  showSearchTokensModal?: boolean;
+  showLeftSearchTokensModal?: boolean;
+  showRightSearchTokensModal?: boolean;
 };
 
 export const useModalsStore = defineStore("modals", () => {
   const showConnectWalletModal = ref<State["connectWalletModal"]>(false);
-  const showSearchTokensModal = ref<State["connectWalletModal"]>(false);
+  const showLeftSearchTokensModal =
+    ref<State["showLeftSearchTokensModal"]>(false);
+  const showRightSearchTokensModal =
+    ref<State["showRightSearchTokensModal"]>(false);
 
-  function setShowConnectWalletModal(payload: State["connectWalletModal"]) {
+  function showConnectWalletModalSet(payload: State["connectWalletModal"]) {
     showConnectWalletModal.value = payload;
   }
 
-  function showConnectWalletModalFn() {
-    setShowConnectWalletModal(true);
+  function showConnectWalletModalOpen() {
+    showConnectWalletModalSet(true);
   }
 
-  function hideConnectWalletModalFn() {
-    setShowConnectWalletModal(false);
+  function showConnectWalletModalHide() {
+    showConnectWalletModalSet(false);
     useWalletStore().setConnecting({
       link: undefined,
     });
   }
 
-  function setShowSearchTokensModal(payload: State["showSearchTokensModal"]) {
-    showSearchTokensModal.value = payload;
+  function showLeftSearchTokensModalSet(
+    payload: State["showLeftSearchTokensModal"],
+  ) {
+    showLeftSearchTokensModal.value = payload;
   }
 
-  function showSearchTokensModalFn() {
-    setShowSearchTokensModal(true);
+  function showLeftSearchTokensModalOpen() {
+    showLeftSearchTokensModalSet(true);
   }
 
-  function hideSearchTokensModalFn() {
-    setShowSearchTokensModal(false);
+  function showLeftSearchTokensModalHide() {
+    showLeftSearchTokensModalSet(false);
+  }
+
+  function showRightSearchTokensModalSet(
+    payload: State["showRightSearchTokensModal"],
+  ) {
+    showRightSearchTokensModal.value = payload;
+  }
+
+  function showRightSearchTokensModalOpen() {
+    showRightSearchTokensModalSet(true);
+  }
+
+  function showRightSearchTokensModalHide() {
+    showRightSearchTokensModalSet(false);
   }
 
   return {
     showConnectWalletModal,
-    showConnectWalletModalFn,
-    hideConnectWalletModalFn,
-    showSearchTokensModal,
-    setShowSearchTokensModal,
-    showSearchTokensModalFn,
-    hideSearchTokensModalFn,
+    showLeftSearchTokensModal,
+    showRightSearchTokensModal,
+    showConnectWalletModalSet,
+    showConnectWalletModalOpen,
+    showConnectWalletModalHide,
+    showLeftSearchTokensModalSet,
+    showLeftSearchTokensModalOpen,
+    showLeftSearchTokensModalHide,
+    showRightSearchTokensModalSet,
+    showRightSearchTokensModalOpen,
+    showRightSearchTokensModalHide,
   };
 });
