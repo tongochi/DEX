@@ -295,7 +295,7 @@ function isNumber(evt: any) {
                   </span>
                   <div class="flex items-center mt-[0.25rem]">
                     <button class="text-[1.125rem] text-[#F9F9F9] tracking-[-0.05625rem] leading-normal not-italic cursor-pointer" @click="storeModals.showSearchTokensModalFn">
-                      $PET 
+                      {{ storeJettons.leftToken?.symbol ?? 'Select' }}
                     </button>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                       <path d="M10.6203 7.63804L5.04729 2.32804C4.9543 2.23939 4.83076 2.18994 4.70229 2.18994C4.57382 2.18994 4.45028 2.23939 4.35729 2.32804L4.35129 2.33404C4.30606 2.37701 4.27004 2.42874 4.24542 2.48607C4.22081 2.5434 4.20812 2.60514 4.20812 2.66754C4.20812 2.72993 4.22081 2.79167 4.24542 2.849C4.27004 2.90634 4.30606 2.95806 4.35129 3.00104L9.59929 8.00104L4.35129 12.999C4.30606 13.042 4.27004 13.0937 4.24542 13.1511C4.22081 13.2084 4.20812 13.2701 4.20812 13.3325C4.20812 13.3949 4.22081 13.4567 4.24542 13.514C4.27004 13.5713 4.30606 13.6231 4.35129 13.666L4.35729 13.672C4.45028 13.7607 4.57382 13.8101 4.70229 13.8101C4.83076 13.8101 4.9543 13.7607 5.04729 13.672L10.6203 8.36204C10.6693 8.31534 10.7083 8.25918 10.735 8.19695C10.7616 8.13472 10.7754 8.06773 10.7754 8.00004C10.7754 7.93234 10.7616 7.86535 10.735 7.80312C10.7083 7.7409 10.6693 7.68473 10.6203 7.63804Z" fill="white"/>
@@ -305,10 +305,10 @@ function isNumber(evt: any) {
                         <span class="text-[#CDFD51] text-left flex w-full pl-[30px] text-[1.5625rem] font-normal mt-[1rem]">
                           Select token
                         </span>
-                        <button class="w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px]" @click="() => console.log(storeJettons.findJettonBySymbol('jUSDT'))">
+                        <button class="w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px]" @click="() => storeJettons.leftTokenSet(storeJettons.findJettonBySymbol('jUSDT'))">
                           <span class="text-white-1 flex justify-center items-center h-full">jUSDT</span>
                         </button>
-                        <button class="w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[16px]" @click="() => console.log(storeJettons.findJettonBySymbol('STON'))">
+                        <button class="w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[16px]" @click="() => storeJettons.leftTokenSet(storeJettons.findJettonBySymbol('STON'))">
                           <span class="text-white-1 flex justify-center items-center h-full">STON</span>
                         </button>
                       </template>

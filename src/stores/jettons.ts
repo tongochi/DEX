@@ -13,6 +13,8 @@ type Jettons = Jetton[];
 
 type State = {
   entity: Jettons;
+  leftToken?: Jetton;
+  rightToken?: Jetton;
 };
 
 export const useJettonStore = defineStore("jettons", () => {
@@ -33,6 +35,9 @@ export const useJettonStore = defineStore("jettons", () => {
     },
   ]);
 
+  const leftToken = ref<State["leftToken"]>(undefined);
+  const rightToken = ref<State["rightToken"]>(undefined);
+
   const findJettonBySymbol = (symbol: JettonSymbols) => {
     return entity.value.find((jetton) => {
       if (jetton.symbol === symbol) {
@@ -41,8 +46,20 @@ export const useJettonStore = defineStore("jettons", () => {
     });
   };
 
+  const leftTokenSet = (payload: State["leftToken"]) => {
+    leftToken.value = payload;
+  };
+
+  const rightTokenSet = (payload: State["rightToken"]) => {
+    rightToken.value = payload;
+  };
+
   return {
     entity: readonly(entity),
+    leftToken,
+    rightToken,
     findJettonBySymbol,
+    leftTokenSet,
+    rightTokenSet,
   };
 });
