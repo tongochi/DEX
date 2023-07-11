@@ -44,7 +44,7 @@ defineProps<{show?: boolean, close?: () => void;}>();
                     <svg xmlns="http://www.w3.org/2000/svg" class="max-h-[532px] max-w-[416px]" viewBox="0 0 416 532" fill="none">
                         <path d="M0.5 512V52.2843C0.5 47.1125 2.55446 42.1526 6.21142 38.4957L38.4957 6.21142C42.1526 2.55446 47.1125 0.5 52.2843 0.5H396C406.77 0.5 415.5 9.23045 415.5 20V476.418C415.5 481.181 413.757 485.779 410.6 489.345L379.095 524.927C375.394 529.107 370.078 531.5 364.495 531.5H20C9.23044 531.5 0.5 522.77 0.5 512Z" fill="#232323" stroke="#CDFD51"/>
                     </svg>
-                    <div class="mt-[19px] absolute max-h-[532px] max-w-[416px] flex flex-col justify-start items-center top-0 right-0 left-0 bottom-0">
+                    <div class="mt-[19px] absolute max-h-[532px] max-w-[416px] flex flex-col justify-start items-center top-0 right-0 left-0 bottom-0 overflow-auto">
                         <slot name="content"></slot>
                     </div>
                 </div>
