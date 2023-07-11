@@ -6,7 +6,7 @@ import TonWeb from 'tonweb';
 import { ConnectedWalletFromAPI, useWalletStore } from './stores/wallet';
 import { Router, ROUTER_REVISION, ROUTER_REVISION_ADDRESS } from '@ston-fi/sdk';
 import { bytesToBase64, uintToHex } from 'ton3-core/dist/utils/helpers';
-import { Address, BOC, Coins, Slice } from 'ton3-core';
+import { Address, BOC, Slice } from 'ton3-core';
 import AppConnectWallet from './components/AppConnectWallet.vue';
 import AppExtraButton from './components/AppExtraButton.vue';
 import { useModalsStore } from './stores/modals';
@@ -17,8 +17,7 @@ const storeWallet = useWalletStore()
 const storeModals = useModalsStore();
 const storeJettons = useJettonStore();
 
-const usdToSton = ref('');
-const stonToUsd = ref('');
+const leftToken = ref('');
 
 async function postData(url = "", data = {}) {
   const response = await fetch(url, {
@@ -328,10 +327,8 @@ function isNumber(evt: any) {
                     </span>
                     </div>
                     <div class="flex items-center mt-[0.25rem]">
-                      <span class="text-[1.5rem] text-[#F9F9F9] text-right tracking-[-0.075rem] leading-normal not-italic font-normal">
-                        0.00
-                      </span>
-                      </div>
+                      <input v-model="leftToken" type="number" @keypress="isNumber" class="text-[1.5rem] text-[#F9F9F9] text-right tracking-[-0.075rem] leading-normal not-italic font-normal bg-transparent w-fit" />
+                    </div>
                     </div>
                   </div>
                 <div>
@@ -373,12 +370,12 @@ function isNumber(evt: any) {
                       </svg>
                       <span class="text-[0.875rem] text-[#797979] text-right tracking-[-0.04375rem] leading-normal not-italic font-normal">
                       0
-                    </span>
+                      </span>
                     </div>
                     <div class="flex items-center mt-[0.25rem]">
-                      <span class="text-[1.5rem] text-[#F9F9F9] text-right tracking-[-0.075rem] leading-normal not-italic font-normal">
+                      <!-- <span class="text-[1.5rem] text-[#F9F9F9] text-right tracking-[-0.075rem] leading-normal not-italic font-normal">
                         0.00
-                      </span>
+                      </span> -->
                       </div>
                     </div>
                   </div>
@@ -390,20 +387,12 @@ function isNumber(evt: any) {
 
             <!-- @type number -->
             <!-- storeForms.swap.tokenLeft.value === 0 && storeForms.swap.tokenRight.value === 0 ? "Enter an amount" : "Swap" -->
-            <AppExtraButton text="Enter an amount" width="w-[450px]" height="h-[61px]" />
+            <AppExtraButton :text="(storeJettons.leftToken && storeJettons.rightToken) ? 'Swap' : 'Select tokens' " width="w-[450px]" height="h-[61px]" @click="swapJettons(storeJettons.leftToken?.addressMinterBouncable!, storeJettons.rightToken?.addressMinterBouncable!, (Number(leftToken) * (10 ** storeJettons.leftToken?.decimals!)).toString())" />
           </div>
         </div>
         <!-- <pre class="text-white-1">{{wallet}}</pre> -->
-      <div class="flex flex-col justify-center mt-2">
-        <input v-model="usdToSton" type="number" @keypress="isNumber" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-        <button @click="swapJettons(storeJettons.entity[0].addressMinterBouncable, storeJettons.entity[1].addressMinterBouncable, (Number(usdToSton) * 1e6).toString())" class="text-white-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Swap jettons ({{usdToSton}} jUSDT -> STON)</button>
-      </div>
-      <div class="flex flex-col justify-center mt-2">
-        <input v-model="stonToUsd" type="number" @keypress="isNumber" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-        <button @click="swapJettons(storeJettons.entity[1].addressMinterBouncable, storeJettons.entity[0].addressMinterBouncable, new Coins(stonToUsd).toNano())" class="text-white-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Swap jettons ({{stonToUsd}} STON -> jUSDT)</button>
-      </div>
       <div class="flex justify-center mt-1.5">
-        <button @click="disconnect" class="w-full text-white-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Disconnect</button>
+        <AppExtraButton text="Disconnect" :on_click="disconnect" width="w-[220px]" height="h-[60px]" />
       </div>
       </main>
     </div>
