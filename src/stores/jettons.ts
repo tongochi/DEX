@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { readonly, ref } from "vue";
 
 type JettonSymbols = "jUSDT" | "STON";
 
@@ -33,15 +33,8 @@ export const useJettonStore = defineStore("jettons", () => {
     },
   ]);
 
-  const findJettonBySymbol = (
-    jettons: {
-      symbol: string;
-      addressMinterBouncable: string;
-      addressMinterRaw: string;
-    }[],
-    symbol: JettonSymbols,
-  ) => {
-    return jettons.find((jetton) => {
+  const findJettonBySymbol = (symbol: JettonSymbols) => {
+    return entity.value.find((jetton) => {
       if (jetton.symbol === symbol) {
         return jetton;
       }
@@ -49,7 +42,7 @@ export const useJettonStore = defineStore("jettons", () => {
   };
 
   return {
-    entity,
+    entity: readonly(entity),
     findJettonBySymbol,
   };
 });
