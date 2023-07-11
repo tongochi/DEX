@@ -6,7 +6,7 @@ import TonWeb from 'tonweb';
 import { ConnectedWalletFromAPI, useWalletStore } from './stores/wallet';
 import { Router, ROUTER_REVISION, ROUTER_REVISION_ADDRESS } from '@ston-fi/sdk';
 import { bytesToBase64, uintToHex } from 'ton3-core/dist/utils/helpers';
-import { Address, BOC, Slice } from 'ton3-core';
+import { BOC, Slice } from 'ton3-core';
 import AppConnectWallet from './components/AppConnectWallet.vue';
 import AppExtraButton from './components/AppExtraButton.vue';
 import { useModalsStore } from './stores/modals';
@@ -139,42 +139,7 @@ const parseBocBase64 = (bocBase64: string) => {
 }
 
 onMounted(async () => {
-  console.log(new Address('EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO').toString('raw')); // ston
-  console.log(new Address('EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA').toString('raw')); // jusdt
-
-  const t = [
-      {
-        "value": "te6ccuEBAQEADgAcABjVMnbbAAAjjN/pQ8OUt8hp"
-      },
-      {
-        "value": "te6ccuEBAQEANQBqAGZzYtCcAAAjjN/pQ8NQmasQyAgAcx8ShmRebO0RtS6aLAfKsNbqQjkLW5af0gSg4DEpTNB4dPjD"
-      },
-      {
-        "value": "te6ccuECAgEAAIcAAKIBDgGcsbvyF40AJ2UWV0N7lpkTAdb95TxFNxE9HIjlqdHz4aWCR2O824iiD8udFrK3g1yK0sey6Cp0sHXOSza+HqKlBympoxdkp8BPAAABzAADAQBoYgAcx8ShmRebO0RtS6aLAfKsNbqQjkLW5af0gSg4DEpTNCAhYOwAAAAAAAAAAAAAAAAAAApFK8Y="
-      },
-      {
-        "value": "te6ccuEBAQEADgAcABjVMnbbAAAAAAAAMDkRbQJP"
-      },
-      {
-        "value": "te6ccuECAwEAAQkAAKIBfgISAZxuyoebGfZ8VzQxmyLY+6Oo2rpK18db4nkdZrmefxPrZFc/gN3BkihD30iN0Kd042EItJTJrQPP/9yR20Ub+9gHKamjF2SloxkAAAHLAAMBAdViAEEnePzvnrqta5YU7cinRN3z8ZRMnEoV9MC37fAb1kQDoO5rKAAAAAAAAAAAAAAAAAAAD4p+pQAAAAAAADA5Q7msoAgA7zuZAqJxsqAciTilI8/iTnGEeq62piAAHtRKd6wOcJwQPy5RAwIAjyWThWGAApWA5YrFIkZa+bJ7vYJARri8uevEBP6Td4tUTty6RJsBACy/jkW+aeL88vemIpoefVf/8+hTSg/CQ6wpZifdJdDUUHgZZmo="
-      },
-      {
-        "value": "te6ccuEBAQEADgAcABjVMnbbAAAAAAAAMDkRbQJP"
-      },
-      {
-        "value": "te6ccuECAwEAAQkAAKIBfgISAZz9bCinap+6c7eTfDZgllrnln8kh4WJMDktj2xgCFtAopyo79YwlyTNV0WPrkJUbfiPwPFJ3KwxR9KkhOouE4QCKamjF2SloBwAAAHKAAMBAdViAEEnePzvnrqta5YU7cinRN3z8ZRMnEoV9MC37fAb1kQDoO5rKAAAAAAAAAAAAAAAAAAAD4p+pQAAAAAAADA5Q7msoAgA7zuZAqJxsqAciTilI8/iTnGEeq62piAAHtRKd6wOcJwQPy5RAwIAjyWThWGAApWA5YrFIkZa+bJ7vYJARri8uevEBP6Td4tUTty6RJsBACy/jkW+aeL88vemIpoefVf/8+hTSg/CQ6wpZifdJdDUUGtul2o="
-      }
-    ];
-
-  parseBocBase64(t[0].value); // cashback
-  parseBocBase64(t[1].value); // token recieved, 41.25 SCALE
-  parseBocBase64(t[2].value); // receive 41.25 SCALE
-
-  parseBocBase64(t[3].value); // cashback
-  parseBocBase64(t[4].value); // 1 STON to 1 jUSDT
-
-  parseBocBase64(t[5].value); // cashback
-  parseBocBase64(t[6].value); // 1 STON to 1 jUSDT
+  parseBocBase64('te6cckECAwEAASkAAZy4BhDUtLNN7WHrok9mtfoNlW88tbDknxwNISF93aFRHvz2eJIYEbyXCavIET/6eLwQUlGXeKc+o5xSYvXQiXEBKamjF2StPBcAAAHcAAMBAdNiADt3BW0qwi2ouZa0VVtB+ItsTRR0reXdrNlHeXz4Q1KUIO5rKAAAAAAAAAAAAAAAAAAAD4p+pQAAAAAAADA5MBhqCADvO5kConGyoByJOKUjz+JOcYR6rramIAAe1Ep3rA5wnBA/LlEDAgDRJZOFYYAQ9yRINU1K++Yk4owYITipv7MTQ11AZewg+ljLrdEPOcEALL+ORb5p4vzy96Yimh59V//z6FNKD8JDrClmJ90l0NRwA7EHhSlJYfIhYxf+w8lAO49GOpLyOAhRF4lOxne6kIJKui5UtQ==');
 
   const tonConnect = new TonConnect({
     manifestUrl: 'https://about.systemdesigndao.xyz/ton-connect.manifest.json',
