@@ -305,12 +305,12 @@ function isNumber(evt: any) {
                         <span class="text-[#CDFD51] text-left flex w-full pl-[30px] text-[1.5625rem] font-normal mt-[1rem]">
                           Select token
                         </span>
-                        <div class="w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px]">
+                        <button class="w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px]" @click="() => console.log(storeJettons.findJettonBySymbol('jUSDT'))">
                           <span class="text-white-1 flex justify-center items-center h-full">jUSDT</span>
-                        </div>
-                        <div class="w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[16px]">
+                        </button>
+                        <button class="w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[16px]" @click="() => console.log(storeJettons.findJettonBySymbol('STON'))">
                           <span class="text-white-1 flex justify-center items-center h-full">STON</span>
-                        </div>
+                        </button>
                       </template>
                     </AppModal>
                   </div>
