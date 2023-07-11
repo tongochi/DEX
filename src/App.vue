@@ -290,12 +290,12 @@ function isNumber(evt: any) {
               </div>
             </div>
             <div class="w-full mt-[0rem] mb-[1.25rem] flex justify-between">
-              <div class="flex flex-col flex-1">
+              <div class="flex flex-col flex-1 cursor-pointer" @click="storeModals.showLeftSearchTokensModalOpen">
                   <span class="text-[0.875rem] text-[#797979] tracking-[-0.04375rem] leading-normal not-italic">
                     You sell
                   </span>
                   <div class="flex items-center mt-[0.25rem]">
-                    <button class="text-[1.125rem] text-[#F9F9F9] tracking-[-0.05625rem] leading-normal not-italic cursor-pointer" @click="storeModals.showLeftSearchTokensModalOpen">
+                    <button class="text-[1.125rem] text-[#F9F9F9] tracking-[-0.05625rem] leading-normal not-italic">
                       {{ storeJettons.leftToken?.symbol ?? 'Select' }}
                     </button>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -335,8 +335,8 @@ function isNumber(evt: any) {
               </div>
             </div>
             <div class="w-full mt-[0.81rem] mb-[0.94rem] w-full h-[0.0625rem] bg-[#797979]"></div>
-            <div class="w-full mt-[0rem] mb-[1.25rem] flex justify-between">
-              <div class="flex flex-col flex-1">
+            <div class="w-full mt-[0rem] mb-[1.25rem] flex justify-between" >
+              <div class="flex flex-col flex-1 cursor-pointer" @click="storeModals.showRightSearchTokensModalOpen">
                   <span class="text-[0.875rem] text-[#797979] tracking-[-0.04375rem] leading-normal not-italic">
                     You receive
                   </span>
@@ -353,7 +353,7 @@ function isNumber(evt: any) {
                       </template>
                   </AppModal>
                   <div class="flex items-center mt-[0.25rem]">
-                    <span class="text-[1.125rem] text-[#F9F9F9] tracking-[-0.05625rem] leading-normal not-italic cursor-pointer" @click="storeModals.showRightSearchTokensModalOpen">
+                    <span class="text-[1.125rem] text-[#F9F9F9] tracking-[-0.05625rem] leading-normal not-italic">
                       {{ storeJettons.rightToken?.symbol ?? 'Select' }}
                     </span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
