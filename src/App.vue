@@ -387,7 +387,7 @@ function isNumber(evt: any) {
 
             <!-- @type number -->
             <!-- storeForms.swap.tokenLeft.value === 0 && storeForms.swap.tokenRight.value === 0 ? "Enter an amount" : "Swap" -->
-            <AppExtraButton :text="(storeJettons.leftToken && storeJettons.rightToken) ? 'Swap' : 'Select tokens' " width="max-w-[450px] w-full" height="h-[61px]" @click="swapJettons(storeJettons.leftToken?.addressMinterBouncable!, storeJettons.rightToken?.addressMinterBouncable!, (Number(leftToken) * (10 ** storeJettons.leftToken?.decimals!)).toString())" :disabled="(storeJettons.leftToken && storeJettons.rightToken)" />
+            <AppExtraButton :text="(storeJettons.leftToken !== undefined && storeJettons.rightToken !== undefined) ? 'Swap' : 'Select tokens' " width="max-w-[450px] w-full" height="h-[61px]" @click="swapJettons(storeJettons.leftToken?.addressMinterBouncable!, storeJettons.rightToken?.addressMinterBouncable!, (Number(leftToken) * (10 ** storeJettons.leftToken?.decimals!)).toString())" :disabled="(storeJettons.leftToken === undefined && storeJettons.rightToken === undefined)" />
           </div>
         </div>
         <!-- <pre class="text-white-1">{{wallet}}</pre> -->
