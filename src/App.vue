@@ -274,7 +274,7 @@ function isNumber(evt: any) {
               </span>
               <div class="flex">
                 <!-- class="mr-[1.44rem]" -->
-                <button @click="storeJettons.leftTokenSwapToRightToken">
+                <button @click="storeJettons.leftTokenSwapToRightToken" :disabled="(storeJettons.leftToken === undefined && storeJettons.rightToken === undefined)">
                   <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
                     <path d="M2.52065 3.29832L2.41498 3.41754L2.30233 3.30489L0.15 1.15256V6.975H5.97244L3.99452 4.99708L3.89671 4.89927L3.98629 4.79388C5.31552 3.22985 7.28238 2.225 9.5 2.225C13.47 2.225 16.6937 5.3992 16.7735 9.35H18.8488C18.7687 4.25477 14.6143 0.15 9.5 0.15C6.71725 0.15 4.2303 1.36949 2.52065 3.29832ZM15.0055 14.0029L15.1033 14.1007L15.0137 14.2061C13.6845 15.7702 11.7176 16.775 9.5 16.775C5.52997 16.775 2.30628 13.6008 2.22651 9.65H0.151178C0.231289 14.7452 4.38567 18.85 9.5 18.85C12.2791 18.85 14.7697 17.6305 16.4793 15.7017L16.585 15.5825L16.6977 15.6951L18.85 17.8474V12.025H13.0276L15.0055 14.0029Z" fill="#CDFD51" stroke="black" stroke-width="0.3"/>
                   </svg>
@@ -327,7 +327,7 @@ function isNumber(evt: any) {
                     </span>
                     </div>
                     <div class="flex items-center mt-[0.25rem]">
-                      <input v-model="leftToken" type="number" @keypress="isNumber" class="text-[1.5rem] text-[#F9F9F9] text-right tracking-[-0.075rem] leading-normal not-italic font-normal bg-transparent w-fit" />
+                      <input v-model="leftToken" type="number" @keypress="isNumber" class="text-[1.5rem] text-[#F9F9F9] text-right tracking-[-0.075rem] leading-normal not-italic font-normal bg-transparent w-fit w-full" :disabled="(storeJettons.leftToken === undefined && storeJettons.rightToken === undefined)" />
                     </div>
                     </div>
                   </div>
@@ -387,7 +387,7 @@ function isNumber(evt: any) {
 
             <!-- @type number -->
             <!-- storeForms.swap.tokenLeft.value === 0 && storeForms.swap.tokenRight.value === 0 ? "Enter an amount" : "Swap" -->
-            <AppExtraButton :text="(storeJettons.leftToken && storeJettons.rightToken) ? 'Swap' : 'Select tokens' " width="w-[450px]" height="h-[61px]" @click="swapJettons(storeJettons.leftToken?.addressMinterBouncable!, storeJettons.rightToken?.addressMinterBouncable!, (Number(leftToken) * (10 ** storeJettons.leftToken?.decimals!)).toString())" />
+            <AppExtraButton :text="(storeJettons.leftToken && storeJettons.rightToken) ? 'Swap' : 'Select tokens' " width="max-w-[450px] w-full" height="h-[61px]" @click="swapJettons(storeJettons.leftToken?.addressMinterBouncable!, storeJettons.rightToken?.addressMinterBouncable!, (Number(leftToken) * (10 ** storeJettons.leftToken?.decimals!)).toString())" :disabled="(storeJettons.leftToken && storeJettons.rightToken)" />
           </div>
         </div>
         <!-- <pre class="text-white-1">{{wallet}}</pre> -->
