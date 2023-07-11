@@ -5,14 +5,13 @@ import {
     Dialog,
     DialogPanel,
 } from '@headlessui/vue'
-import { useWalletStore } from '../stores';
 
-const store = useWalletStore()
+defineProps<{show?: boolean, close?: () => void;}>();
 </script>
 
 <template>
-    <TransitionRoot appear :show="store.showConnectWalletModal" as="template">
-      <Dialog as="div" @close="store.hideConnectWalletModalFn" class="relative z-10">
+    <TransitionRoot appear :show="show" as="template">
+      <Dialog as="div" @close="close" class="relative z-10">
         <TransitionChild
           as="template"
           enter="duration-300 ease-out"
@@ -56,4 +55,4 @@ const store = useWalletStore()
       </Dialog>
     </TransitionRoot>
   </template>
-  
+  ../stores/wallet

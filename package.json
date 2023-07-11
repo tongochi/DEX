@@ -26,6 +26,8 @@
   },
   "devDependencies": {
     "@types/node": "^20.3.2",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-vue": "^4.1.0",
     "autoprefixer": "^10.4.14",
     "eslint": "^8.44.0",
@@ -42,6 +44,9 @@
     "vue-tsc": "^1.4.2"
   },
   "lint-staged": {
-    "*.{js,ts}": ["npm run lint", "prettier --write"]
+    "*.{js,ts}": [
+      "npm run lint",
+      "prettier --write"
+    ]
   }
 }
