@@ -265,7 +265,7 @@ function isNumber(evt: any) {
       <header>
 
       </header>
-      <main class="flex flex-col bg-[#0F0F0F] h-screen">
+      <main class="flex flex-col bg-[#0F0F0F] h-screen p-[1.25rem]">
         <div class="w-full mt-[5.31rem] mb-[1.25rem]">
           <div class="max-w-[28.1875rem] h-[19.1875rem] mx-auto">
             <div class="flex justify-between h-[3.75rem] items-center">
