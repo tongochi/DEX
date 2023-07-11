@@ -233,4 +233,4 @@ const { connecting } = storeToRefs(store)
   height: 3.4375rem;
   flex-shrink: 0;
 }
-</style>../stores/wallet
+</style>

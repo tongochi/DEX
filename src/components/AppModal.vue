@@ -55,4 +55,3 @@ defineProps<{show?: boolean, close?: () => void;}>();
       </Dialog>
     </TransitionRoot>
   </template>
-  ../stores/wallet
