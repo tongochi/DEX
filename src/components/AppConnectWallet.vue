@@ -220,7 +220,10 @@ const { connecting } = storeToRefs(store)
           <span class="text-white-1 flex justify-center items-center h-full">Connect tonhub</span>
         </div>
         <div class="flex justify-center mt-4">
-          <QRCodeStyling v-if="connecting?.link" :text="connecting.link" />
+          <div v-if="connecting?.link" class="flex justify-center flex-col">
+            <QRCodeStyling :text="connecting.link" />  
+            <a class="mt-4 text-white-1 text-center" target="_blank" :href="connecting?.link">Or open with the link</a>
+          </div>
         </div>
       </template>
     </AppModal>
