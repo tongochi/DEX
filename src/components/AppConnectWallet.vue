@@ -222,7 +222,7 @@ const { connecting } = storeToRefs(store)
         <div class="flex justify-center mt-4">
           <div v-if="connecting?.link" class="flex justify-center flex-col">
             <QRCodeStyling :text="connecting.link" />  
-            <a class="mt-4 text-white-1 text-center" target="_blank" :href="connecting?.link">Or open with the link</a>
+            <a class="my-4 text-white-1 text-center" target="_blank" :href="connecting?.link">Or open with the link</a>
           </div>
         </div>
       </template>
