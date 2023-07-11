@@ -14,14 +14,14 @@ defineProps<{show?: boolean, close?: () => void;}>();
       <Dialog as="div" @close="close" class="relative z-10">
         <TransitionChild
           as="template"
-          enter="duration-300 ease-out"
+          enter="transition ease-in will-change-auto"
           enter-from="opacity-0"
           enter-to="opacity-100"
-          leave="duration-200 ease-in"
+          leave="ease-in"
           leave-from="opacity-100"
           leave-to="opacity-0"
         >
-          <div class="fixed inset-0 bg-black bg-opacity-25" />
+          <div class="fixed inset-0 overflow-y-auto bg-black-4 bg-opacity-50" />
         </TransitionChild>
   
         <div class="fixed inset-0 overflow-y-auto bg-black-5/80">
@@ -30,15 +30,15 @@ defineProps<{show?: boolean, close?: () => void;}>();
           >
             <TransitionChild
               as="template"
-              enter="duration-300 ease-out"
+              enter="transition ease-in will-change-auto"
               enter-from="opacity-0"
               enter-to="opacity-100"
-              leave="duration-200 ease-in"
+              leave="ease-in"
               leave-from="opacity-100"
               leave-to="opacity-0"
             >
               <DialogPanel
-                class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all bg-transparent"
+                class="w-full max-w-md overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all bg-transparent will-change-transform"
               >
                 <div class="relative">
                     <svg xmlns="http://www.w3.org/2000/svg" class="max-h-[532px] max-w-[416px]" viewBox="0 0 416 532" fill="none">
