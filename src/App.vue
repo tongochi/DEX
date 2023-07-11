@@ -275,9 +275,11 @@ function isNumber(evt: any) {
               </span>
               <div class="flex">
                 <!-- class="mr-[1.44rem]" -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
-                  <path d="M2.52065 3.29832L2.41498 3.41754L2.30233 3.30489L0.15 1.15256V6.975H5.97244L3.99452 4.99708L3.89671 4.89927L3.98629 4.79388C5.31552 3.22985 7.28238 2.225 9.5 2.225C13.47 2.225 16.6937 5.3992 16.7735 9.35H18.8488C18.7687 4.25477 14.6143 0.15 9.5 0.15C6.71725 0.15 4.2303 1.36949 2.52065 3.29832ZM15.0055 14.0029L15.1033 14.1007L15.0137 14.2061C13.6845 15.7702 11.7176 16.775 9.5 16.775C5.52997 16.775 2.30628 13.6008 2.22651 9.65H0.151178C0.231289 14.7452 4.38567 18.85 9.5 18.85C12.2791 18.85 14.7697 17.6305 16.4793 15.7017L16.585 15.5825L16.6977 15.6951L18.85 17.8474V12.025H13.0276L15.0055 14.0029Z" fill="#CDFD51" stroke="black" stroke-width="0.3"/>
-                </svg>
+                <button @click="storeJettons.leftTokenSwapToRightToken">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
+                    <path d="M2.52065 3.29832L2.41498 3.41754L2.30233 3.30489L0.15 1.15256V6.975H5.97244L3.99452 4.99708L3.89671 4.89927L3.98629 4.79388C5.31552 3.22985 7.28238 2.225 9.5 2.225C13.47 2.225 16.6937 5.3992 16.7735 9.35H18.8488C18.7687 4.25477 14.6143 0.15 9.5 0.15C6.71725 0.15 4.2303 1.36949 2.52065 3.29832ZM15.0055 14.0029L15.1033 14.1007L15.0137 14.2061C13.6845 15.7702 11.7176 16.775 9.5 16.775C5.52997 16.775 2.30628 13.6008 2.22651 9.65H0.151178C0.231289 14.7452 4.38567 18.85 9.5 18.85C12.2791 18.85 14.7697 17.6305 16.4793 15.7017L16.585 15.5825L16.6977 15.6951L18.85 17.8474V12.025H13.0276L15.0055 14.0029Z" fill="#CDFD51" stroke="black" stroke-width="0.3"/>
+                  </svg>
+                </button>
                 <!-- <svg xmlns="http://www.w3.org/2000/svg" width="28" height="21" viewBox="0 0 28 21" fill="none">
                   <path d="M1 4.1665H4.16667" stroke="#CDFD51" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M7.33333 7.33334C6.49347 7.33334 5.68802 6.99971 5.09415 6.40585C4.50028 5.81198 4.16665 5.00653 4.16665 4.16667C4.16665 3.32682 4.50028 2.52136 5.09415 1.9275C5.68802 1.33363 6.49347 1 7.33333 1C7.74918 1 8.16096 1.08191 8.54516 1.24105C8.92936 1.40019 9.27845 1.63344 9.5725 1.9275C9.86656 2.22155 10.0998 2.57064 10.259 2.95484C10.4181 3.33904 10.5 3.75082 10.5 4.16667C10.5 4.58253 10.4181 4.99431 10.259 5.37851C10.0998 5.7627 9.86656 6.1118 9.5725 6.40585C9.27845 6.6999 8.92936 6.93316 8.54516 7.0923C8.16096 7.25144 7.74918 7.33334 7.33333 7.33334Z" stroke="#CDFD51" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -294,23 +296,22 @@ function isNumber(evt: any) {
                     You sell
                   </span>
                   <div class="flex items-center mt-[0.25rem]">
-                    <button class="text-[1.125rem] text-[#F9F9F9] tracking-[-0.05625rem] leading-normal not-italic cursor-pointer" @click="storeModals.showSearchTokensModalFn">
+                    <button class="text-[1.125rem] text-[#F9F9F9] tracking-[-0.05625rem] leading-normal not-italic cursor-pointer" @click="storeModals.showLeftSearchTokensModalOpen">
                       {{ storeJettons.leftToken?.symbol ?? 'Select' }}
                     </button>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                       <path d="M10.6203 7.63804L5.04729 2.32804C4.9543 2.23939 4.83076 2.18994 4.70229 2.18994C4.57382 2.18994 4.45028 2.23939 4.35729 2.32804L4.35129 2.33404C4.30606 2.37701 4.27004 2.42874 4.24542 2.48607C4.22081 2.5434 4.20812 2.60514 4.20812 2.66754C4.20812 2.72993 4.22081 2.79167 4.24542 2.849C4.27004 2.90634 4.30606 2.95806 4.35129 3.00104L9.59929 8.00104L4.35129 12.999C4.30606 13.042 4.27004 13.0937 4.24542 13.1511C4.22081 13.2084 4.20812 13.2701 4.20812 13.3325C4.20812 13.3949 4.22081 13.4567 4.24542 13.514C4.27004 13.5713 4.30606 13.6231 4.35129 13.666L4.35729 13.672C4.45028 13.7607 4.57382 13.8101 4.70229 13.8101C4.83076 13.8101 4.9543 13.7607 5.04729 13.672L10.6203 8.36204C10.6693 8.31534 10.7083 8.25918 10.735 8.19695C10.7616 8.13472 10.7754 8.06773 10.7754 8.00004C10.7754 7.93234 10.7616 7.86535 10.735 7.80312C10.7083 7.7409 10.6693 7.68473 10.6203 7.63804Z" fill="white"/>
                     </svg>
-                    <AppModal :show="storeModals.showSearchTokensModal" :close="storeModals.hideSearchTokensModalFn">
+                    <AppModal :show="storeModals.showLeftSearchTokensModal" :close="storeModals.showLeftSearchTokensModalHide">
                       <template #content>
                         <span class="text-[#CDFD51] text-left flex w-full pl-[30px] text-[1.5625rem] font-normal mt-[1rem]">
                           Select token
                         </span>
-                        <button class="w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px]" @click="() => storeJettons.leftTokenSet(storeJettons.findJettonBySymbol('jUSDT'))">
-                          <span class="text-white-1 flex justify-center items-center h-full">jUSDT</span>
-                        </button>
-                        <button class="w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[16px]" @click="() => storeJettons.leftTokenSet(storeJettons.findJettonBySymbol('STON'))">
-                          <span class="text-white-1 flex justify-center items-center h-full">STON</span>
-                        </button>
+                        <template v-for="jetton in storeJettons.entity">
+                          <button :class="`w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px] disabled:bg-black-1`" :disabled="(storeJettons.leftToken?.symbol === jetton.symbol) || (storeJettons.rightToken?.symbol === jetton.symbol)" @click="() => storeJettons.leftTokenSet(storeJettons.findJettonBySymbol(jetton.symbol))">
+                            <span class="text-white-1 flex justify-center items-center h-full">{{ jetton.symbol }}</span>
+                          </button>
+                        </template>
                       </template>
                     </AppModal>
                   </div>
@@ -342,9 +343,21 @@ function isNumber(evt: any) {
                   <span class="text-[0.875rem] text-[#797979] tracking-[-0.04375rem] leading-normal not-italic">
                     You receive
                   </span>
+                  <AppModal :show="storeModals.showRightSearchTokensModal" :close="storeModals.showRightSearchTokensModalHide">
+                      <template #content>
+                        <span class="text-[#CDFD51] text-left flex w-full pl-[30px] text-[1.5625rem] font-normal mt-[1rem]">
+                          Select token
+                        </span>
+                        <template v-for="jetton in storeJettons.entity">
+                          <button :class="`w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px] disabled:bg-black-1`" :disabled="(storeJettons.leftToken?.symbol === jetton.symbol) || (storeJettons.rightToken?.symbol === jetton.symbol)" @click="() => storeJettons.rightTokenSet(storeJettons.findJettonBySymbol(jetton.symbol))">
+                            <span class="text-white-1 flex justify-center items-center h-full">{{ jetton.symbol }}</span>
+                          </button>
+                        </template>
+                      </template>
+                  </AppModal>
                   <div class="flex items-center mt-[0.25rem]">
-                    <span class="text-[1.125rem] text-[#F9F9F9] tracking-[-0.05625rem] leading-normal not-italic cursor-pointer">
-                      Select
+                    <span class="text-[1.125rem] text-[#F9F9F9] tracking-[-0.05625rem] leading-normal not-italic cursor-pointer" @click="storeModals.showRightSearchTokensModalOpen">
+                      {{ storeJettons.rightToken?.symbol ?? 'Select' }}
                     </span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                       <path d="M10.6203 7.63804L5.04729 2.32804C4.9543 2.23939 4.83076 2.18994 4.70229 2.18994C4.57382 2.18994 4.45028 2.23939 4.35729 2.32804L4.35129 2.33404C4.30606 2.37701 4.27004 2.42874 4.24542 2.48607C4.22081 2.5434 4.20812 2.60514 4.20812 2.66754C4.20812 2.72993 4.22081 2.79167 4.24542 2.849C4.27004 2.90634 4.30606 2.95806 4.35129 3.00104L9.59929 8.00104L4.35129 12.999C4.30606 13.042 4.27004 13.0937 4.24542 13.1511C4.22081 13.2084 4.20812 13.2701 4.20812 13.3325C4.20812 13.3949 4.22081 13.4567 4.24542 13.514C4.27004 13.5713 4.30606 13.6231 4.35129 13.666L4.35729 13.672C4.45028 13.7607 4.57382 13.8101 4.70229 13.8101C4.83076 13.8101 4.9543 13.7607 5.04729 13.672L10.6203 8.36204C10.6693 8.31534 10.7083 8.25918 10.735 8.19695C10.7616 8.13472 10.7754 8.06773 10.7754 8.00004C10.7754 7.93234 10.7616 7.86535 10.735 7.80312C10.7083 7.7409 10.6693 7.68473 10.6203 7.63804Z" fill="white"/>
