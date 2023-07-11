@@ -3,13 +3,15 @@ import { storeToRefs } from 'pinia'
 import { onMounted, watch } from 'vue'
 import {TonConnect} from '@tonconnect/sdk'
 import QRCodeStyling from './QRCodeStyling.vue';
-import { ConnectedWalletFromAPI, useWalletStore } from '../stores'
+import { ConnectedWalletFromAPI, useWalletStore } from '../stores/wallet'
+import { useModalsStore } from '../stores/modals'
 import { uintToHex } from 'ton3-core/dist/utils/helpers';
 import { Address, BOC, Slice } from 'ton3-core';
 import AppExtraButton from './AppExtraButton.vue'
 import AppModal from './AppModal.vue'
 
 const store = useWalletStore()
+const storeModals = useModalsStore();
 
 const walletConnectionSource = {
   tonkeeper: {
@@ -205,8 +207,8 @@ const { connecting } = storeToRefs(store)
 
 <template>
   <div class="flex justify-center flex-col">
-    <AppExtraButton text="Connect wallet" :on_click="store.showConnectWalletModalFn" />
-    <AppModal>
+    <AppExtraButton text="Connect wallet" :on_click="storeModals.showConnectWalletModalFn" width="w-[217px]" height="h-[54px]" />
+    <AppModal :show="storeModals.showConnectWalletModal" :close="storeModals.hideConnectWalletModalFn">
       <template #content>
         <span class="text-[#CDFD51] text-left flex w-full pl-[30px] text-[1.5625rem] font-normal">
           Connect wallet
@@ -231,4 +233,4 @@ const { connecting } = storeToRefs(store)
   height: 3.4375rem;
   flex-shrink: 0;
 }
-</style>
+</style>../stores/wallet

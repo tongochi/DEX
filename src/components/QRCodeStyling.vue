@@ -5,14 +5,14 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import QRCodeStyling from 'qr-code-styling';
-import { useWalletStore } from '../stores';
+import { useWalletStore } from '../stores/wallet';
 
 const { text } = defineProps<{ text: string }>()
 
 const qrCode = ref<null | HTMLElement>(null);
 let qrCodeInstance: null | QRCodeStyling = null;
 
-const store = useWalletStore();
+const storeWallet = useWalletStore();
 
 onMounted(() => {
   qrCodeInstance = new QRCodeStyling({
@@ -23,7 +23,7 @@ onMounted(() => {
   qrCode.value && qrCodeInstance.append(qrCode.value);
 });
 
-store.$subscribe((mutation, state) => {
+storeWallet.$subscribe((mutation, state) => {
   if (mutation.storeId === 'wallet' && mutation.type === 'direct') {
     qrCodeInstance?.update({ data: state?.connecting?.link });
   }
