@@ -40,7 +40,7 @@ const swapJettons = async (leftJetton: string, rightJetton: string, amount: stri
   try {
       const WALLET_ADDRESS = storeWallet.wallet?.address.bounceable!; // YOUR WALLET ADDRESS
 
-      const REFERRAL_ADDRESS = undefined; // REFERRAL ADDRESS (OPTIONAL)
+      const REFERRAL_ADDRESS = 'EQDsQeFKUlh8iFjF_7DyUA7j0Y6kvI4CFEXiU7Gd7qQgks-7'; // REFERRAL ADDRESS (OPTIONAL)
 
       const JETTON0 = leftJetton;
       const JETTON1 = rightJetton;
@@ -307,7 +307,10 @@ function isNumber(evt: any) {
                           Select token
                         </span>
                         <template v-for="jetton in storeJettons.entity">
-                          <button :class="`w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px] disabled:bg-black-1`" :disabled="(storeJettons.leftToken?.symbol === jetton.symbol) || (storeJettons.rightToken?.symbol === jetton.symbol)" @click="() => storeJettons.leftTokenSet(storeJettons.findJettonBySymbol(jetton.symbol))">
+                          <button :class="`w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px] disabled:bg-black-1`" :disabled="(storeJettons.leftToken?.symbol === jetton.symbol) || (storeJettons.rightToken?.symbol === jetton.symbol)" @click="() => {
+                            storeJettons.leftTokenSet(storeJettons.findJettonBySymbol(jetton.symbol));
+                            storeModals.showLeftSearchTokensModalHide();
+                          }">
                             <span class="text-white-1 flex justify-center items-center h-full">{{ jetton.symbol }}</span>
                           </button>
                         </template>
@@ -346,7 +349,10 @@ function isNumber(evt: any) {
                           Select token
                         </span>
                         <template v-for="jetton in storeJettons.entity">
-                          <button :class="`w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px] disabled:bg-black-1`" :disabled="(storeJettons.leftToken?.symbol === jetton.symbol) || (storeJettons.rightToken?.symbol === jetton.symbol)" @click="() => storeJettons.rightTokenSet(storeJettons.findJettonBySymbol(jetton.symbol))">
+                          <button :class="`w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px] disabled:bg-black-1`" :disabled="(storeJettons.leftToken?.symbol === jetton.symbol) || (storeJettons.rightToken?.symbol === jetton.symbol)" @click="() => {
+                            storeJettons.rightTokenSet(storeJettons.findJettonBySymbol(jetton.symbol));
+                            storeModals.showRightSearchTokensModalHide();
+                          }">
                             <span class="text-white-1 flex justify-center items-center h-full">{{ jetton.symbol }}</span>
                           </button>
                         </template>
