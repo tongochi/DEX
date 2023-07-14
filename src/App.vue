@@ -12,6 +12,7 @@ import AppExtraButton from './components/AppExtraButton.vue';
 import { useModalsStore } from './stores/modals';
 import AppModal from './components/AppModal.vue';
 import { useJettonStore } from './stores/jettons';
+import { notify } from '@kyvg/vue3-notification';
 
 const storeWallet = useWalletStore()
 const storeModals = useModalsStore();
@@ -79,11 +80,26 @@ const swapJettons = async (leftJetton: string, rightJetton: string, amount: stri
           ]
       }
 
+      notify({
+              text: "Request for transaction sended now, checkout the wallet",
+              group: 'custom-template-warning',
+            });
+
       const result = await storeWallet.entity?.sendTransaction(transaction);
 
       console.log('Transaction was sent successfully', result);
+
+      notify({
+              text: "Transaction was sent successfully, wait for transfering token and get cashback",
+              group: 'custom-template-success',
+            });
   } catch (e) {
       console.error(e);
+
+      notify({
+              text: (e as any).toString(),
+              group: 'custom-template-error',
+            });
   }
 }
 
@@ -176,8 +192,17 @@ onMounted(async () => {
             localStorage.setItem('wallet', JSON.stringify(data));
 
             storeWallet.setWallet(data);
+
+            notify({
+              text: "Connected the wallet",
+              group: 'custom-template-success',
+            });
           } catch (err) {
             console.error(err);
+            notify({
+              text: (err as any).toString(),
+              group: 'custom-template-error',
+            });
           }
 					return;
 				}
@@ -200,6 +225,10 @@ watch(() => storeWallet?.entity?.connected, async () => {
       const data = JSON.parse(localWallet);
       storeWallet.setWallet(data);
       storeWallet.setLoading(false);
+      notify({
+        text: "Restored connection",
+        group: 'custom-template-success',
+      });
     }
   }
 })
@@ -371,6 +400,45 @@ function isNumber(evt: any) {
   <div v-else class="flex justify-center items-center h-screen bg-[#0F0F0F] text-white-1">
     loading wallet state...
   </div>
+  <notifications
+      group="custom-template-success"
+      :duration="5000"
+      position="top right"
+    >
+      <template #body="{ item }">
+        <div class="absolute top-0 right-0 w-fit h-fit bg-[#68CD86] flex items-center justify-center p-1">
+          <div class="text-center text-white-1 font-[0.8rem]">
+            {{ item.text }}
+          </div>
+        </div>
+      </template>
+  </notifications>
+  <notifications
+      group="custom-template-error"
+      :duration="5000"
+      position="top right"
+    >
+      <template #body="{ item }">
+        <div class="absolute top-0 right-0 w-fit h-fit bg-[#EB7767] flex items-center justify-center p-1">
+          <div class="text-center text-white-1 font-[0.8rem]">
+            {{ item.text }}
+          </div>
+        </div>
+      </template>
+  </notifications>
+  <notifications
+      group="custom-template-warning"
+      :duration="5000"
+      position="top right"
+    >
+      <template #body="{ item }">
+        <div class="absolute top-0 right-0 w-fit h-fit bg-[#ebdc67] flex items-center justify-center p-1">
+          <div class="text-center text-white-1 font-[0.8rem]">
+            {{ item.text }}
+          </div>
+        </div>
+      </template>
+  </notifications>
 </template>
 
 <style scoped>
