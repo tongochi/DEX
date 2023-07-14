@@ -324,7 +324,7 @@ function isNumber(evt: any) {
                     </span>
                     </div>
                     <div class="flex items-center mt-[0.25rem]">
-                      <input v-model="leftToken" type="number" @keypress="isNumber" class="text-[1.5rem] text-[#F9F9F9] text-right tracking-[-0.075rem] leading-normal not-italic font-normal bg-transparent w-fit w-full" :disabled="(storeJettons.leftToken === undefined && storeJettons.rightToken === undefined)" />
+                      <input v-model="leftToken" type="number" @keypress="isNumber" class="text-[1.5rem] text-[#F9F9F9] text-right tracking-[-0.075rem] leading-normal not-italic font-normal bg-transparent w-fit w-full caret-white border-none focus:outline-none" :disabled="(storeJettons.leftToken === undefined && storeJettons.rightToken === undefined)" autofocus />
                     </div>
                     </div>
                   </div>
