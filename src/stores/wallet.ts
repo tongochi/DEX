@@ -21,6 +21,8 @@ type State = {
     link?: string;
   };
   loading?: boolean;
+  waitingForConnect?: boolean;
+  waitingForSwap?: boolean;
 };
 
 export const useWalletStore = defineStore("wallet", () => {
@@ -30,6 +32,9 @@ export const useWalletStore = defineStore("wallet", () => {
   const loading = ref<State["loading"]>(
     localStorage.getItem("wallet") ? true : false,
   );
+
+  const waitingForConnect = ref<State["waitingForConnect"]>(false);
+  const waitingForSwap = ref<State["waitingForSwap"]>(false);
 
   function setEntity(payload: TonConnect) {
     entity.value = payload;
@@ -49,14 +54,26 @@ export const useWalletStore = defineStore("wallet", () => {
     loading.value = payload;
   }
 
+  function waitingForConnectSet(payload: State["waitingForConnect"]) {
+    waitingForConnect.value = payload;
+  }
+
+  function waitingForSwapSet(payload: State["waitingForSwap"]) {
+    waitingForSwap.value = payload;
+  }
+
   return {
     entity,
     wallet,
     connecting,
     loading,
+    waitingForConnect,
+    waitingForSwap,
     setEntity,
     setWallet,
     setConnecting,
     setLoading,
+    waitingForConnectSet,
+    waitingForSwapSet,
   };
 });
