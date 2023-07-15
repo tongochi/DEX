@@ -51,7 +51,6 @@ const { connecting } = storeToRefs(store)
 </script>
 
 <template>
-  <div class="flex justify-center flex-col h-screen w-screen items-center">
     <AppExtraButton text="Connect wallet" :on_click="storeModals.showConnectWalletModalOpen" width="w-[217px]" height="h-[54px]" />
     <AppModal :show="storeModals.showConnectWalletModal" :close="storeModals.showConnectWalletModalHide">
       <template #content>
@@ -72,13 +71,8 @@ const { connecting } = storeToRefs(store)
         </div>
       </template>
     </AppModal>
-  </div>
 </template>
 
 <style scoped>
-.header {
-  width: 87.5625rem;
-  height: 3.4375rem;
-  flex-shrink: 0;
-}
+
 </style>
