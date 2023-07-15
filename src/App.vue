@@ -249,10 +249,8 @@ function isNumber(evt: any) {
 <template>
   <div v-if="loading === false">
     <div v-if="wallet === undefined">
-      <header class="bg-[#0F0F0F]">
-            <AppConnectWallet />
-        </header>
-        <main class="bg-[#0F0F0F] h-screen">
+        <main class="bg-[#0F0F0F] h-screen flex justify-center items-center">
+          <AppConnectWallet />
         </main>
     </div>
     <div v-else>
