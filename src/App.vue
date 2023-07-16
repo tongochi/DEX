@@ -303,8 +303,8 @@ function isNumber(evt: any) {
                           Select token
                         </span>
                         <template v-for="jetton in storeJettons.entity">
-                          <button :class="`w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px] disabled:bg-black-1`" @click="() => {
-                            if (storeJettons.rightToken?.symbol === jetton.symbol) {
+                          <button :class="`w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[16px] disabled:bg-black-1`" @click="() => {
+                            if (storeJettons.rightToken?.symbol === jetton.symbol) {  
                               storeJettons.rightTokenSet(undefined);
                             }
                             storeJettons.leftTokenSet(storeJettons.findJettonBySymbol(jetton.symbol));
@@ -336,7 +336,7 @@ function isNumber(evt: any) {
                 <div>
               </div>
             </div>
-            <div class="w-full mt-[0.81rem] mb-[0.94rem] w-full h-[0.0625rem] bg-[#797979]"></div>
+            <div class="w-full mt-[0.81rem] mb-[0.94rem] h-[0.0625rem] bg-[#797979]"></div>
             <div class="w-full mt-[0rem] mb-[1.25rem] flex justify-between" >
               <div class="flex flex-col flex-1 cursor-pointer" @click="storeModals.showRightSearchTokensModalOpen">
                   <span class="text-[0.875rem] text-[#797979] tracking-[-0.04375rem] leading-normal not-italic">
@@ -348,7 +348,7 @@ function isNumber(evt: any) {
                           Select token
                         </span>
                         <template v-for="jetton in storeJettons.entity">
-                          <button :class="`w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[32px] disabled:bg-black-1`" @click="() => {
+                          <button :class="`w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[16px] disabled:bg-black-1`" @click="() => {
                             if (storeJettons.leftToken?.symbol === jetton.symbol) {
                               storeJettons.leftTokenSet(undefined);
                             }
