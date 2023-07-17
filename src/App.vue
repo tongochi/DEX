@@ -13,7 +13,7 @@ import { useModalsStore } from './stores/modals';
 import AppModal from './components/AppModal.vue';
 import { useJettonStore } from './stores/jettons';
 import { notify } from '@kyvg/vue3-notification';
-
+import ky from 'ky';
 import WebApp from '@twa-dev/sdk'
 
 const storeWallet = useWalletStore()
@@ -21,15 +21,6 @@ const storeModals = useModalsStore();
 const storeJettons = useJettonStore();
 
 const leftToken = ref('');
-
-async function postData(url = "", data = {}) {
-  const response = await fetch(url, {
-    method: "POST",
-    cache: "no-cache",
-    body: JSON.stringify(data),
-  });
-  return response;
-}
 
 const disconnect = async () => {
   if (storeWallet?.entity?.connected) {
@@ -185,13 +176,15 @@ onMounted(async () => {
               address: wallet.account.address
           };
           try {
-            const { token } = await (await postData('https://ton-dapp-backend.systemdesigndao.xyz/ton-proof/checkProof', obj)).json();
-            const data = await (await fetch(`https://ton-dapp-backend.systemdesigndao.xyz/dapp/getAccountInfo?network=${obj.network}`, {
+            const { token } = await ky.post('https://ton-dapp-backend.systemdesigndao.xyz/ton-proof/checkProof', {
+              body: JSON.stringify(obj),
+            }).json() as { token: string };
+            const data = await ky.get(`https://ton-dapp-backend.systemdesigndao.xyz/dapp/getAccountInfo?network=${obj.network}`, {
                     headers: {
                       Authorization: `Bearer ${token}`,
                       'Content-Type': 'application/json',
                     }
-            })).json() as ConnectedWalletFromAPI;
+            }).json() as ConnectedWalletFromAPI;
 
             localStorage.setItem('wallet', JSON.stringify(data));
 
