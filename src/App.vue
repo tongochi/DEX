@@ -63,9 +63,9 @@ export interface BalanceElement {
 // https://dton.io/graphql - default key
 // ?getBalances - unique parameter on our client
 const { data, error } = useSWRV('https://dton.io/graphql?getBalances', (...args: string[]) => {
-  const [url, gResponse] = args;
+  const [url] = args;
 
-  return fetcher(url, gResponse, {});
+  return fetcher(url, '', {});
 });
 const castedData = data as unknown as Balance;
 
