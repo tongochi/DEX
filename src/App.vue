@@ -5,8 +5,7 @@ import {TonConnect} from '@tonconnect/sdk';
 import TonWeb from 'tonweb';
 import { ConnectedWalletFromAPI, useWalletStore } from './stores/wallet';
 import { Router, ROUTER_REVISION, ROUTER_REVISION_ADDRESS } from '@ston-fi/sdk';
-import { bytesToBase64, uintToHex } from 'ton3-core/dist/utils/helpers';
-import { BOC, Slice } from 'ton3-core';
+import { bytesToBase64 } from 'ton3-core/dist/utils/helpers';
 import AppConnectWallet from './components/AppConnectWallet.vue';
 import AppExtraButton from './components/AppExtraButton.vue';
 import { useModalsStore } from './stores/modals';
@@ -15,10 +14,74 @@ import { useJettonStore } from './stores/jettons';
 import { notify } from '@kyvg/vue3-notification';
 import ky from 'ky';
 import WebApp from '@twa-dev/sdk'
-
+import useSWRV, { mutate as m } from 'swrv'
+import { fetcher } from './utils';
+import { gql } from 'graphql-request';
+import { Spinner } from 'flowbite-vue'
+import { Coins } from 'ton3-core';
 const storeWallet = useWalletStore()
 const storeModals = useModalsStore();
 const storeJettons = useJettonStore();
+
+const gResponse = gql`
+    query GetBalances($owner_wc: Int!, $owner_address: String!) {
+      account: account_states(
+        workchain: $owner_wc,
+        address: $owner_address
+      ) {
+        balance: account_storage_balance_grams
+      },
+
+      balances: account_states(
+        parsed_jetton_wallet_owner_address_workchain: $owner_wc,
+        parsed_jetton_wallet_owner_address_address: $owner_address
+      ) {
+        minter_wc: parsed_jetton_wallet_jetton_address_workchain
+        minter_address: parsed_jetton_wallet_jetton_address_address
+        balance: parsed_jetton_wallet_balance
+        decimals: parsed_jetton_content_decimals_value
+      }
+    }
+  `;
+
+export interface Balance {
+    account:  Account[];
+    balances: BalanceElement[];
+}
+
+export interface Account {
+    balance: string;
+}
+
+export interface BalanceElement {
+    minter_wc:      number;
+    minter_address: string;
+    balance:        string;
+    decimals:       null;
+}
+
+// https://dton.io/graphql - default key
+// ?getBalances - unique parameter on our client
+const { data, error } = useSWRV('https://dton.io/graphql?getBalances', (...args: string[]) => {
+  const [url, gResponse] = args;
+
+  return fetcher(url, gResponse, {});
+});
+const castedData = data as unknown as Balance;
+
+watch(
+  () => storeWallet.wallet?.address.raw, 
+  async () => {
+    const splittedRaw = storeWallet.wallet?.address.raw.split(':');
+
+    const r = await fetcher('https://dton.io/graphql?getBalances', gResponse, {
+      "owner_wc": splittedRaw![0],
+      "owner_address": splittedRaw![1].toUpperCase(),
+    });
+
+    m('https://dton.io/graphql?getBalances', r)
+  }
+);
 
 const leftToken = ref('');
 
@@ -96,61 +159,9 @@ const swapJettons = async (leftJetton: string, rightJetton: string, amount: stri
   }
 }
 
-enum JettonOps {
-    TRANSFER = '0xf8a7ea5',
-    TRANSFER_NOTIFICATION = '0x7362d09c',
-    INTERNAL_TRANSFER = '0x178d4519',
-    EXCESSES = '0xd53276db',
-    BURN = '0x595f07bc',
-    BURN_NOTIFICATION = '0x7bdd97de',
-}
-
-const loadTransferNotification = (body: Slice, payload: { opUint32Hex: string }) => {
-    const queryId = body.loadBigUint(64);
-    const jettonAmount = body.loadCoins();
-    const from = body.loadAddress();
-    const forwardPayload = body.loadBit() ? Slice.parse(body.loadRef()) : body;
-
-    return {
-      ...payload,
-      queryId,
-      jettonAmount,
-      from,
-      forwardPayload,
-    };
-};
-          
-const parseBocBase64 = (bocBase64: string) => {
-  // 0x7362d09c - jetton transfer notification
-  const [ deserialized ] = BOC.from(bocBase64);
-  const slice = deserialized.slice();
-  const opUint32 = slice.loadUint(32);
-  const opUint32Hex = `0x${uintToHex(opUint32)}`;
-  console.log(opUint32, opUint32Hex);
-
-  if (opUint32Hex === JettonOps.TRANSFER) {
-
-    const queryId = slice.loadBigUint(64);
-    const amount = slice.loadCoins();
-
-    console.log(queryId, amount);
-  }
-
-  if (opUint32Hex === JettonOps.TRANSFER_NOTIFICATION) {
-    console.log(loadTransferNotification(slice, { opUint32Hex }))
-  }
-
-  if (opUint32Hex === JettonOps.EXCESSES) {
-    console.log('exc');
-    const queryId = slice.loadBigUint(64);
-    console.log(queryId);
-  }
-}
-
 onMounted(async () => {
   WebApp.ready();
   WebApp.expand();
-  parseBocBase64('te6cckECAwEAASkAAZy4BhDUtLNN7WHrok9mtfoNlW88tbDknxwNISF93aFRHvz2eJIYEbyXCavIET/6eLwQUlGXeKc+o5xSYvXQiXEBKamjF2StPBcAAAHcAAMBAdNiADt3BW0qwi2ouZa0VVtB+ItsTRR0reXdrNlHeXz4Q1KUIO5rKAAAAAAAAAAAAAAAAAAAD4p+pQAAAAAAADA5MBhqCADvO5kConGyoByJOKUjz+JOcYR6rramIAAe1Ep3rA5wnBA/LlEDAgDRJZOFYYAQ9yRINU1K++Yk4owYITipv7MTQ11AZewg+ljLrdEPOcEALL+ORb5p4vzy96Yimh59V//z6FNKD8JDrClmJ90l0NRwA7EHhSlJYfIhYxf+w8lAO49GOpLyOAhRF4lOxne6kIJKui5UtQ==');
 
   const tonConnect = new TonConnect({
     manifestUrl: 'https://about.systemdesigndao.xyz/ton-connect.manifest.json',
@@ -255,6 +266,14 @@ function isNumber(evt: any) {
 
       </header>
       <main class="flex flex-col bg-[#0F0F0F] h-screen p-[1.25rem]">
+        <div class="w-full flex justify-center">
+          <div class="text-white-1" v-if="data === undefined"><spinner color="green" size="8" /></div>
+            <div v-else>
+                <div v-if="error === undefined"><span class="text-white-1">{{error}}</span></div>
+                <div><span class="text-white-1">{{ new Coins(castedData.account[0].balance).div(1e9) }} 💎</span>
+            </div>
+          </div>
+        </div>
         <div class="w-full mt-[5.31rem] mb-[1.25rem]">
           <div class="max-w-[28.1875rem] h-[19.1875rem] mx-auto">
             <div class="flex justify-between h-[3.75rem] items-center">
@@ -313,13 +332,13 @@ function isNumber(evt: any) {
                 <div>
                   <div class="flex flex-col flex-1 justify-end">
                     <div class="flex justify-end items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" class="mr-[0.25rem]">
+                      <!-- <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" class="mr-[0.25rem]">
                         <path d="M11.4837 2.79045C11.4316 2.73784 11.3695 2.69612 11.3011 2.66771C11.2327 2.63931 11.1593 2.62479 11.0853 2.625H10.6875V1.6875C10.6873 1.53837 10.628 1.39539 10.5226 1.28994C10.4171 1.18448 10.2741 1.12517 10.125 1.125H2.03032C1.5913 1.12501 1.17027 1.29941 0.859839 1.60984C0.549408 1.92027 0.375006 2.3413 0.375 2.78032V9.21968C0.375006 9.6587 0.549408 10.0797 0.859839 10.3902C1.17027 10.7006 1.5913 10.875 2.03032 10.875H11.0631C11.2119 10.8747 11.3545 10.8156 11.4599 10.7106C11.5653 10.6055 11.6249 10.4631 11.6256 10.3143L11.6478 3.18942C11.6482 3.11537 11.634 3.04196 11.6058 2.97346C11.5776 2.90497 11.5361 2.84276 11.4837 2.79045ZM10.8762 10.125H2.03032C1.79021 10.125 1.55994 10.0296 1.39016 9.85984C1.22038 9.69006 1.125 9.45979 1.125 9.21968V2.78032C1.125 2.54021 1.22038 2.30994 1.39016 2.14016C1.55994 1.97038 1.79021 1.875 2.03032 1.875H9.9375V2.625H2.0625V3.375H10.8972L10.8762 10.125Z" fill="#797979"/>
                         <path d="M9.1875 6.1875H9.9375V6.9375H9.1875V6.1875Z" fill="#797979"/>
                       </svg>
                       <span class="text-[0.875rem] text-[#797979] text-right tracking-[-0.04375rem] leading-normal not-italic font-normal">
                       0
-                    </span>
+                      </span> -->
                     </div>
                     <div class="flex items-center mt-[0.25rem]">
                       <input v-model="leftToken" type="number" @keypress="isNumber" class="text-[1.5rem] text-[#F9F9F9] text-right tracking-[-0.075rem] leading-normal not-italic font-normal bg-transparent w-full caret-white border-none focus:outline-none" :disabled="(storeJettons.leftToken === undefined && storeJettons.rightToken === undefined)" autofocus />
@@ -365,13 +384,13 @@ function isNumber(evt: any) {
                 <div>
                   <div class="flex flex-col flex-1 justify-end">
                     <div class="flex justify-end items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" class="mr-[0.25rem]">
+                      <!-- <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" class="mr-[0.25rem]">
                         <path d="M11.4837 2.79045C11.4316 2.73784 11.3695 2.69612 11.3011 2.66771C11.2327 2.63931 11.1593 2.62479 11.0853 2.625H10.6875V1.6875C10.6873 1.53837 10.628 1.39539 10.5226 1.28994C10.4171 1.18448 10.2741 1.12517 10.125 1.125H2.03032C1.5913 1.12501 1.17027 1.29941 0.859839 1.60984C0.549408 1.92027 0.375006 2.3413 0.375 2.78032V9.21968C0.375006 9.6587 0.549408 10.0797 0.859839 10.3902C1.17027 10.7006 1.5913 10.875 2.03032 10.875H11.0631C11.2119 10.8747 11.3545 10.8156 11.4599 10.7106C11.5653 10.6055 11.6249 10.4631 11.6256 10.3143L11.6478 3.18942C11.6482 3.11537 11.634 3.04196 11.6058 2.97346C11.5776 2.90497 11.5361 2.84276 11.4837 2.79045ZM10.8762 10.125H2.03032C1.79021 10.125 1.55994 10.0296 1.39016 9.85984C1.22038 9.69006 1.125 9.45979 1.125 9.21968V2.78032C1.125 2.54021 1.22038 2.30994 1.39016 2.14016C1.55994 1.97038 1.79021 1.875 2.03032 1.875H9.9375V2.625H2.0625V3.375H10.8972L10.8762 10.125Z" fill="#797979"/>
                         <path d="M9.1875 6.1875H9.9375V6.9375H9.1875V6.1875Z" fill="#797979"/>
                       </svg>
                       <span class="text-[0.875rem] text-[#797979] text-right tracking-[-0.04375rem] leading-normal not-italic font-normal">
                       0
-                      </span>
+                      </span> -->
                     </div>
                     <div class="flex items-center mt-[0.25rem]">
                       <!-- <span class="text-[1.5rem] text-[#F9F9F9] text-right tracking-[-0.075rem] leading-normal not-italic font-normal">
