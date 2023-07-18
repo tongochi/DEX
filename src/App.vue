@@ -18,7 +18,7 @@ import useSWRV, { mutate as m } from 'swrv'
 import { fetcher } from './utils';
 import { gql } from 'graphql-request';
 import { Spinner } from 'flowbite-vue'
-import { Coins } from 'ton3-core';
+
 const storeWallet = useWalletStore()
 const storeModals = useModalsStore();
 const storeJettons = useJettonStore();
@@ -270,7 +270,7 @@ function isNumber(evt: any) {
           <div class="text-white-1" v-if="data === undefined"><spinner color="green" size="8" /></div>
             <div v-else>
                 <div v-if="error === undefined"><span class="text-white-1">{{error}}</span></div>
-                <div><span class="text-white-1">{{ new Coins(castedData.account[0].balance).div(1e9) }} 💎</span>
+                <div><span class="text-white-1">{{ Number(castedData.account[0].balance) / 1e9 }} 💎</span>
             </div>
           </div>
         </div>
