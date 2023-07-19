@@ -177,9 +177,6 @@ const { wallet, loading } = storeToRefs(storeWallet)
         </main>
     </div>
     <div v-else>
-      <header>
-
-      </header>
       <main class="flex flex-col bg-[#0F0F0F] h-screen p-[1.25rem]">
         <div class="w-full flex justify-center">
           <div class="text-white-1" v-if="data === undefined"><spinner color="green" size="8" /></div>
