@@ -1,3 +1,4 @@
+// some feature which has not implemented fully, just parsing boc`s
 import { BOC, Slice } from "ton3-core";
 import { uintToHex } from "ton3-core/dist/utils/helpers";
 
