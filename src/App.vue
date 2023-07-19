@@ -15,7 +15,7 @@ import { notify } from '@kyvg/vue3-notification';
 import ky from 'ky';
 import WebApp from '@twa-dev/sdk'
 import useSWRV, { mutate as m } from 'swrv'
-import { fetcher } from './utils';
+import { fetcher, coinsToNumber } from './utils';
 import { gql } from 'graphql-request';
 import { Spinner } from 'flowbite-vue'
 
@@ -270,7 +270,7 @@ function isNumber(evt: any) {
           <div class="text-white-1" v-if="data === undefined"><spinner color="green" size="8" /></div>
             <div v-else>
                 <div v-if="error === undefined"><span class="text-white-1">{{error}}</span></div>
-                <div><span class="text-white-1">{{ Number(castedData.account[0].balance) / 1e9 }} 💎</span>
+                <div><span class="text-white-1">{{ coinsToNumber(castedData.account[0].balance, 9) }} 💎</span>
             </div>
           </div>
         </div>
@@ -402,11 +402,6 @@ function isNumber(evt: any) {
                 <div>
               </div>
             </div>
-            <!-- @type jUSDT | STON  -->
-            <!-- storeForms.swap.tokenLeft.symbol --> 
-
-            <!-- @type number -->
-            <!-- storeForms.swap.tokenLeft.value === 0 && storeForms.swap.tokenRight.value === 0 ? "Enter an amount" : "Swap" -->
             <AppExtraButton :text="(storeJettons.leftToken !== undefined && storeJettons.rightToken !== undefined) ? 'Swap' : 'Select tokens' " width="max-w-[450px] w-full" height="h-[61px]" @click="swapJettons(storeJettons.leftToken?.addressMinterBouncable!, storeJettons.rightToken?.addressMinterBouncable!, (Number(leftToken) * (10 ** storeJettons.leftToken?.decimals!)).toString())" :disabled="(storeJettons.leftToken === undefined && storeJettons.rightToken === undefined)" />
           </div>
         </div>
