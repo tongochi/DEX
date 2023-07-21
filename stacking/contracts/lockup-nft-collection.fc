@@ -160,7 +160,7 @@ slice calculate_nft_item_address(int wc, cell state_init) {
     }
 
     ;; на смарт контракт положили LP-токены
-    if ((op == op::transfer_notification()) & (msg_value >= min_gas_for_mint)
+    if ((op == op::transfer_notification()) & (msg_value >= (min_gas_for_mint + min_gas_for_mint))
         & (equal_slices(sender_address, jetton_address))) {
         
         int jetton_amount = in_msg_body~load_coins();
