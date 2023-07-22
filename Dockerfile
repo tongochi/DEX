@@ -1,13 +1,10 @@
-FROM node:16 as build-stage
+FROM node:18-alpine as builder
 WORKDIR /app
-COPY package*.json ./
+COPY . .
+RUN npm ci
+RUN npm run build
 
-RUN npm i -g pnpm
-RUN pnpm install
-COPY ./ .
-RUN pnpm build
-
-FROM nginx as production-stage
+FROM nginx as production
 RUN mkdir /app
-COPY --from=build-stage /app/dist /app
+COPY --from=builder /app/dist /app
 COPY nginx.conf /etc/nginx/nginx.conf
