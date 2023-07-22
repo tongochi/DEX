@@ -14,9 +14,9 @@
 #include "imports/params.fc";
 #include "imports/op-codes.fc";
 
-const int min_gas_for_mint = 10000000;
-const int min_gas_for_jetton_transfer = 60000000;
-const int fourteen_days = 1209600; ;; время блокировки в секундах
+const int min_gas_for_mint = 10000000;  ;; 0.01 TON
+const int min_gas_for_jetton_transfer = 60000000;  ;; 0.06 TON
+const int fourteen_days = 180; ;; lock time in seconds
 
 (slice, int, cell, cell, cell, slice) load_data() inline {
   var ds = get_data().begin_parse();
@@ -102,44 +102,51 @@ slice calculate_nft_item_address(int wc, cell state_init) {
         return ();
     }
     
-  
-    if (op == 1) { ;; deploy new nft
-      throw_unless(401, equal_slices(sender_address, owner_address));
-      int item_index = in_msg_body~load_uint(64);
-      throw_unless(402, item_index <= next_item_index);
-      var is_last = (item_index == next_item_index);
-      deploy_nft_item(item_index, nft_item_code, in_msg_body~load_coins(), in_msg_body~load_ref());
-      if (is_last) {
-        next_item_index += 1;
-        save_data(owner_address, next_item_index, content, nft_item_code, royalty_params, jetton_address);
-      }
 
-      return ();
-    }
-    if (op == 2) { ;; batch deploy of new nfts
-      throw_unless(401, equal_slices(sender_address, owner_address));
-      int counter = 0;
-      cell deploy_list = in_msg_body~load_ref();
-      do {
-        var (item_index, item, f?) = deploy_list~udict::delete_get_min(64);
-        if (f?) {
-          counter += 1;
-          if (counter >= 250) { ;; Limit due to limits of action list size
-            throw(399);
-          }
+    ;; op-codes 1 and 2 won't be used, were taken from nft collection template
 
-          throw_unless(403 + counter, item_index <= next_item_index);
-          deploy_nft_item(item_index, nft_item_code, item~load_coins(), item~load_ref());
-          if (item_index == next_item_index) {
-            next_item_index += 1;
-          }
+    if (op == 1) {  ;; deploy new nft      
+        throw_unless(401, equal_slices(sender_address, owner_address));
+        int item_index = in_msg_body~load_uint(64);
+        throw_unless(402, item_index <= next_item_index);
+        var is_last = (item_index == next_item_index);
+
+        deploy_nft_item(item_index, nft_item_code, in_msg_body~load_coins(), in_msg_body~load_ref());
+
+        if (is_last) {
+          next_item_index += 1;
+          save_data(owner_address, next_item_index, content, nft_item_code, royalty_params, jetton_address);
         }
-      } until ( ~ f?);
-      save_data(owner_address, next_item_index, content, nft_item_code, royalty_params, jetton_address);
 
-      return ();
+        return ();
     }
-    if (op == 3) { ;; change owner
+
+    if (op == 2) {  ;; batch deploy of new nfts
+        throw_unless(401, equal_slices(sender_address, owner_address));
+        int counter = 0;
+        cell deploy_list = in_msg_body~load_ref();
+
+        do {
+          var (item_index, item, f?) = deploy_list~udict::delete_get_min(64);
+          if (f?) {
+            counter += 1;
+            throw_if(399, counter >= 250);
+            throw_unless(403 + counter, item_index <= next_item_index);
+
+            deploy_nft_item(item_index, nft_item_code, item~load_coins(), item~load_ref());
+
+            if (item_index == next_item_index) {
+              next_item_index += 1;
+            }
+          }
+        } until ( ~ f?);
+
+        save_data(owner_address, next_item_index, content, nft_item_code, royalty_params, jetton_address);
+
+        return ();
+    }
+
+    if (op == 3) {  ;; change owner
       throw_unless(401, equal_slices(sender_address, owner_address));
       slice new_owner = in_msg_body~load_msg_addr();
       save_data(new_owner, next_item_index, content, nft_item_code, royalty_params, jetton_address);
@@ -149,89 +156,90 @@ slice calculate_nft_item_address(int wc, cell state_init) {
 
     ;; custom op-codes for farming
 
-    ;; Очень тупая реализация получения jetton кошелька для этого смарт контракта
+    ;; op-code for save new jetton_wallet_address in storage
     if (op == 4) {
-      if (~(equal_slices(sender_address, owner_address))) {
-        throw(0x11);
-      }
+      throw_unless(403, equal_slices(sender_address, owner_address));
+
       slice new_jetton_address = in_msg_body~load_msg_addr();
       save_data(owner_address, next_item_index, content, nft_item_code, royalty_params, new_jetton_address);
+
       return ();
     }
 
-    ;; на смарт контракт положили LP-токены
-    if ((op == op::transfer_notification()) & (msg_value >= (min_gas_for_mint + min_gas_for_mint))
-        & (equal_slices(sender_address, jetton_address))) {
+    ;; jetton transfer notification
+    if (op == op::transfer_notification()) {
+        throw_unless(400, equal_slices(sender_address, jetton_address));
+        throw_unless(13, (msg_value >= min_gas_for_mint + min_gas_for_mint));
         
         int jetton_amount = in_msg_body~load_coins();
         slice from_address = in_msg_body~load_msg_addr();
 
-        ;; TODO поменять эту чепуху на нормальный контент
+        ;; TODO change this to a human-read NFT content
         cell nft_content = begin_cell()
-                            .store_uint(now(), 64)
-                            .store_coins(jetton_amount)
+                            .store_uint(now(), 64)  ;; time of lockup start
+                            .store_coins(jetton_amount)  ;; amount of jettons to lock
                           .end_cell();
         cell nft_message = begin_cell()
-                            .store_slice(from_address)
+                            .store_slice(from_address)  
                             .store_ref(nft_content)
                            .end_cell();
 
-        deploy_nft_item(next_item_index, nft_item_code, min_gas_for_mint, nft_message);
+        ;; deployment of NFT that proofs ownership of locked jettons
+        deploy_nft_item(next_item_index, nft_item_code, min_gas_for_mint, nft_message); 
         
         next_item_index += 1;
         save_data(owner_address, next_item_index, content, nft_item_code, royalty_params, jetton_address);
+
         var msg = begin_cell()
                         .store_uint(0x18, 6) 
                         .store_slice(from_address)
                         .store_coins(0)
                         .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1);
-        send_raw_message(msg.end_cell(), 64);
+        send_raw_message(msg.end_cell(), 64);  ;; return all the remaining TON to sender
+
         return ();
     }
 
-    ;; на смарт контракт отправили NFT
-    if ((op == op::ownership_assigned()) & (msg_value >= min_gas_for_jetton_transfer)) {
+    ;; NFT transfer notification
+    if (op == op::ownership_assigned()) {
+        throw_unless(13, msg_value >= min_gas_for_jetton_transfer);
+
         slice from_address = in_msg_body~load_msg_addr();
 
-        {- когда сообщение будет пересылаться на контракт коллекции,
-           в нем должен будет храниться индекс NFT, чтобы проверять, 
-           что это NFT из этой коллекции -}
-
-        int item_index = in_msg_body~load_uint(64);
+        ;; check that nft is from this collection
+        int item_index = in_msg_body~load_uint(64);  
         cell state_init = calculate_nft_item_state_init(item_index, nft_item_code);
         slice nft_address = calculate_nft_item_address(workchain(), state_init);
+        throw_unless(400, equal_slices(sender_address, nft_address));
 
-        if (equal_slices(sender_address, nft_address)) {
-            slice nft_content = in_msg_body~load_ref().begin_parse();
-            int start_time = nft_content~load_uint(64);
-            int now_time = now();
-            if (now_time - start_time > fourteen_days) { 
+        slice nft_content = in_msg_body~load_ref().begin_parse();
 
-              int stacked_amount = nft_content~load_coins();
+        ;; check that lockup period is over
+        int start_time = nft_content~load_uint(64);
+        int now_time = now();
+        throw_unless(400, (now_time - start_time > fourteen_days));
 
-              var new_msg_body = begin_cell()
-                                  .store_uint(op::transfer_jetton(), 32)
-                                  .store_uint(query_id, 64)
-                                  .store_coins(stacked_amount)
-                                  .store_slice(from_address)
-                                  .store_slice(from_address)
-                                  .store_uint(0, 1)
-                                  .store_coins(0)
-                                  .store_uint(0, 1)
-                                .end_cell();
+        int stacked_amount = nft_content~load_coins();
 
-              var msg = begin_cell()
-                        .store_uint(0x10, 6) 
-                        .store_slice(jetton_address)
-                        .store_coins(min_gas_for_jetton_transfer)
-                        .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1)
-                        .store_uint(1, 1)
-                        .store_ref(new_msg_body);
-
-              send_raw_message(msg.end_cell(), 65); 
-            }
-        }
-
+        var new_msg_body = begin_cell()
+                            .store_uint(op::transfer_jetton(), 32)
+                            .store_uint(query_id, 64)
+                            .store_coins(stacked_amount)
+                            .store_slice(from_address)
+                            .store_slice(from_address)
+                            .store_uint(0, 1)
+                            .store_coins(0)
+                            .store_uint(0, 1)
+                          .end_cell();
+        var msg = begin_cell()
+                  .store_uint(0x10, 6) 
+                  .store_slice(jetton_address)
+                  .store_coins(min_gas_for_jetton_transfer)
+                  .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1)
+                  .store_uint(1, 1)
+                  .store_ref(new_msg_body);
+        send_raw_message(msg.end_cell(), 65); 
+      
         return ();
     }
 
