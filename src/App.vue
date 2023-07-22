@@ -63,7 +63,7 @@ const { data, error } = useSWRV('https://dton.io/graphql?getBalances', (...args:
 const castedData = data as unknown as Balance;
 
 watch(
-  () => storeWallet.wallet?.address.raw, 
+  () => storeWallet.wallet?.address.raw,
   async () => {
     const splittedRaw = storeWallet.wallet?.address.raw.split(':');
 
@@ -89,7 +89,7 @@ onMounted(async () => {
   WebApp.expand();
 
   const tonConnect = new TonConnect({
-    manifestUrl: 'https://about.systemdesigndao.xyz/ton-connect.manifest.json',
+    manifestUrl: 'https://api.tongochi.org/static/ton-connect.manifest.json',
   });
 
   storeWallet.setEntity(tonConnect);
@@ -112,10 +112,11 @@ onMounted(async () => {
               address: wallet.account.address
           };
           try {
-            const { token } = await ky.post('https://ton-dapp-backend.systemdesigndao.xyz/ton-proof/checkProof', {
+            const { token } = await ky.post('https://api.tongochi.org/dex/ton-proof/checkProof', {
               body: JSON.stringify(obj),
             }).json() as { token: string };
-            const data = await ky.get(`https://ton-dapp-backend.systemdesigndao.xyz/dapp/getAccountInfo?network=${obj.network}`, {
+
+            const data = await ky.get(`https://api.tongochi.org/dex/dapp/getAccountInfo?network=${obj.network}`, {
                     headers: {
                       Authorization: `Bearer ${token}`,
                       'Content-Type': 'application/json',
