@@ -56,7 +56,7 @@ const swapJettons = async (leftJetton: string, rightJetton: string, amount: stri
         // from everyone who using this code to swap jettons
         referralAddress: REFERRAL_ADDRESS,
       });
-      
+
       const transaction = {
           validUntil: Date.now() + 1000000,
           messages: [
@@ -134,7 +134,7 @@ const swapJettons = async (leftJetton: string, rightJetton: string, amount: stri
                         </span>
                         <template v-for="jetton in storeJettons.entity">
                           <button :class="`w-[calc(100%-26px-26px)] mx-auto h-[60px] rounded-[20px] bg-[#00000080] cursor-pointer mt-[16px] disabled:bg-black-1`" @click="() => {
-                            if (storeJettons.rightToken?.symbol === jetton.symbol) {  
+                            if (storeJettons.rightToken?.symbol === jetton.symbol) {
                               storeJettons.rightTokenSet(undefined);
                             }
                             storeJettons.leftTokenSet(storeJettons.findJettonBySymbol(jetton.symbol));
