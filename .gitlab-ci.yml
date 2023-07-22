@@ -1,0 +1,96 @@
+variables:
+  CONTAINER_IMAGE: $CI_REGISTRY_IMAGE/image
+
+stages:
+  - build
+  - deploy
+
+
+build-staging:
+  interruptible: true
+  stage: build
+  when: manual
+  allow_failure: false
+  except:
+    - tags
+  tags:
+    - docker
+  image: docker:stable
+  script:
+    - CI_COMMIT_REF_NAME_CLEANED=$(echo $CI_COMMIT_REF_NAME | sed -e 's/\//-/g')
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CONTAINER_IMAGE:${CONTAINER_TAG:-staging} || true
+    - docker build .
+      --cache-from $CONTAINER_IMAGE:${CONTAINER_TAG:-staging}
+      --build-arg CI_COMMIT_TAG=$CI_COMMIT_SHA
+      --build-arg BUILD_ENV=${CI_ENVIRONMENT_NAME:-staging}
+      -t $CONTAINER_IMAGE:${CONTAINER_TAG:-staging}
+      -t $CONTAINER_IMAGE:${CI_COMMIT_REF_NAME_CLEANED}-${CI_COMMIT_SHORT_SHA}-staging
+      -t $CONTAINER_IMAGE:${CI_COMMIT_REF_SLUG}-staging
+    - docker push $CONTAINER_IMAGE:${CONTAINER_TAG:-staging}
+    - docker push $CONTAINER_IMAGE:${CI_COMMIT_REF_NAME_CLEANED}-${CI_COMMIT_SHORT_SHA}-staging
+    - docker push $CONTAINER_IMAGE:${CI_COMMIT_REF_SLUG}-staging
+
+
+build-production:
+  interruptible: true
+  stage: build
+  when: manual
+  only:
+    - tags
+  tags:
+    - docker
+  image: docker:stable
+  script:
+    - export DOCKER_COMPATIBLE_TAG=${CI_COMMIT_TAG////-}
+    - echo $DOCKER_COMPATIBLE_TAG
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CONTAINER_IMAGE:latest || true
+    - docker build .
+      --cache-from $CONTAINER_IMAGE:latest
+      --build-arg CI_COMMIT_TAG=$DOCKER_COMPATIBLE_TAG
+      -t $CONTAINER_IMAGE:$DOCKER_COMPATIBLE_TAG
+      -t $CONTAINER_IMAGE:latest
+    - docker push $CONTAINER_IMAGE:$DOCKER_COMPATIBLE_TAG
+    - docker push $CONTAINER_IMAGE:latest
+
+
+deploy-staging:
+  image: alpine
+  stage: deploy
+  tags:
+    - docker
+  when: manual
+  script:
+    - apk add --no-cache openssh
+    - eval $(ssh-agent -s)
+    - chmod 400 "$UNITY_STAGE_SSH_KEY"
+    - ssh-add "$UNITY_STAGE_SSH_KEY"
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $UNIT_STAGE_URL >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - echo "project path $CI_PROJECT_PATH"
+    - ssh $UNITY_STAGE_USER@$UNIT_STAGE_URL "echo \"$UNITY_STAGE_PASSWORD\" | sudo -S docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
+    - ssh $UNITY_STAGE_USER@$UNIT_STAGE_URL "cd ~/infra/sworm-stage; ./update-stack.sh $CI_PROJECT_PATH $UNITY_STAGE_PASSWORD"
+
+
+deploy-production:
+  image: alpine
+  stage: deploy
+  tags:
+    - docker
+  only:
+    - tags
+  when: manual
+  script:
+    - apk add --no-cache openssh
+    - eval $(ssh-agent -s)
+    - chmod 400 "$UNITY_SWORM_SSH_KEY"
+    - ssh-add "$UNITY_SWORM_SSH_KEY"
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $UNITY_SWORM_URL >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - echo "project path $CI_PROJECT_PATH"
+    - ssh $UNITY_SWORM_USER@$UNITY_SWORM_URL "echo \"$UNITY_SWORM_PASSWORD\" | sudo -S docker login -u $CI_REGISTRY_LOGIN_USER -p $CI_REGISTRY_LOGIN_TOKEN $CI_REGISTRY; ~/infra/update-stack.sh $CI_PROJECT_PATH $UNITY_SWORM_PASSWORD"
