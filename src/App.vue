@@ -183,7 +183,7 @@ const { wallet, loading } = storeToRefs(storeWallet)
           <div class="text-white-1" v-if="data === undefined"><spinner color="green" size="8" /></div>
             <div v-else>
                 <div v-if="error === undefined"><span class="text-white-1">{{error}}</span></div>
-                <div><span class="text-white-1">{{ coinsToNumber(castedData.account[0].balance, 9) }} 💎</span>
+                <div><span class="text-white-1">{{ coinsToNumber(castedData?.account[0]?.balance ?? '', 9) }} 💎</span>
             </div>
           </div>
         </div>
