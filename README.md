@@ -33,3 +33,8 @@ NFT collection contract will check that you sent valid NFT and was your lock per
 - Human-readable NFT content.
 - Burn NFT after withdrawing funds.
 - Return NFT to user if he transferred it to the collection address before lockup period end (maybe).
+
+## Swap
+Swap is based on ton-connect and [ston.fi](https://ston.fi/) swap contracts. 
+
+User connect theirs wallets to the app, then choose tokens to swap in the form, then the transaction in sent to the wallet to be confirmed and then processed.
