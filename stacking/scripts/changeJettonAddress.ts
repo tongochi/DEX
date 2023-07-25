@@ -1,5 +1,5 @@
 import {toNano, internal, beginCell, Address} from "ton";
-import {jettonWalletAddress, collectionJettonWalletAddress, get_wallet_info} from "./config"
+import {collectionJettonWalletAddress, get_wallet_info, collectionAddress} from "./config"
 
 
 async function main() {
@@ -16,7 +16,7 @@ async function main() {
             secretKey: key.secretKey,
             seqno: seqno,
             messages: [internal({
-                to: jettonWalletAddress,
+                to: collectionAddress,
                 value: toNano("0.01"),  
                 body: msgBody,  
                 bounce: true

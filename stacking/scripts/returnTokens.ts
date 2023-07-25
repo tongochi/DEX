@@ -2,11 +2,10 @@ import {toNano, internal, beginCell, Address} from "ton";
 import {jettonWalletAddress, collectionAddress, get_wallet_info} from "./config"
 
 
-async function main() {
+async function main(nftToReturnAddress: string) {
     const {key, walletContract, walletAddress} =  await get_wallet_info()
     let seqno = await walletContract.getSeqno();
-    
-    const nftToReturnAddress = "";  // nft you should return to get back your jettons 
+    // Тело транзакции для разлока токенов, отправляется на адрес bond nft
     let msgBody = beginCell()
                     .storeUint(0x5fcc3d14, 32)
                     .storeUint(Date.now(), 64)
@@ -40,4 +39,4 @@ function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-main();
+main("EQC1fmOozv3Mo5OlxGOz4l10wnrEHPwn2LnvMSqhP0GZWT1M");

@@ -2,16 +2,16 @@ import {toNano, internal, beginCell, Address} from "ton";
 import {jettonWalletAddress, collectionAddress, get_wallet_info} from "./config"
 
 
-async function main() {
+async function main(jettonAmount: string) {
     const {key, walletContract, walletAddress} =  await get_wallet_info()
     let seqno = await walletContract.getSeqno();
-    
+    // Тело транзакции для лока токенов, отправляется на jetton wallet пользователя 
     let msgBody = beginCell()
                     .storeUint(0xf8a7ea5, 32)
                     .storeUint(Date.now(), 64)
-                    .storeCoins(toNano('50'))  // jetton amount 
-                    .storeAddress(Address.parse(collectionAddress))
-                    .storeAddress(walletAddress)
+                    .storeCoins(toNano(jettonAmount))  // jetton amount 
+                    .storeAddress(Address.parse(collectionAddress))  // lockup collection address
+                    .storeAddress(walletAddress)  // sender address 
                     .storeUint(0, 1)
                     .storeCoins(toNano('0.1'))
                     .storeUint(0, 1)
@@ -40,4 +40,4 @@ function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-main();
+main("48");
