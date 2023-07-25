@@ -155,3 +155,9 @@ int min_tons_for_storage() asm "50000000 PUSHINT"; ;; 0.05 TON
   (int init?, int index, slice collection_address, slice owner_address, cell content) = load_data();
   return (init?, index, collection_address, owner_address, content);
 }
+
+(int, int, int) get_nft_content() method_id {  ;; returns lockup_start_time, lockup_period and locked_amount
+  (_, _, _, _, cell content) = load_data();
+  var cs = content.begin_parse();
+  return (cs~load_uint(64), cs~load_uint(64), cs~load_coins());
+}
