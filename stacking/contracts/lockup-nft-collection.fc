@@ -16,7 +16,7 @@
 
 const int min_gas_for_mint = 10000000;  ;; 0.01 TON
 const int min_gas_for_jetton_transfer = 60000000;  ;; 0.06 TON
-const int fourteen_days = 180; ;; lock time in seconds
+const int lockup_period = 180; ;; lock time in seconds
 
 (slice, int, cell, cell, cell, slice) load_data() inline {
   var ds = get_data().begin_parse();
@@ -102,50 +102,6 @@ slice calculate_nft_item_address(int wc, cell state_init) {
         return ();
     }
     
-
-    ;; op-codes 1 and 2 won't be used, were taken from nft collection template
-
-    if (op == 1) {  ;; deploy new nft      
-        throw_unless(401, equal_slices(sender_address, owner_address));
-        int item_index = in_msg_body~load_uint(64);
-        throw_unless(402, item_index <= next_item_index);
-        var is_last = (item_index == next_item_index);
-
-        deploy_nft_item(item_index, nft_item_code, in_msg_body~load_coins(), in_msg_body~load_ref());
-
-        if (is_last) {
-          next_item_index += 1;
-          save_data(owner_address, next_item_index, content, nft_item_code, royalty_params, jetton_address);
-        }
-
-        return ();
-    }
-
-    if (op == 2) {  ;; batch deploy of new nfts
-        throw_unless(401, equal_slices(sender_address, owner_address));
-        int counter = 0;
-        cell deploy_list = in_msg_body~load_ref();
-
-        do {
-          var (item_index, item, f?) = deploy_list~udict::delete_get_min(64);
-          if (f?) {
-            counter += 1;
-            throw_if(399, counter >= 250);
-            throw_unless(403 + counter, item_index <= next_item_index);
-
-            deploy_nft_item(item_index, nft_item_code, item~load_coins(), item~load_ref());
-
-            if (item_index == next_item_index) {
-              next_item_index += 1;
-            }
-          }
-        } until ( ~ f?);
-
-        save_data(owner_address, next_item_index, content, nft_item_code, royalty_params, jetton_address);
-
-        return ();
-    }
-
     if (op == 3) {  ;; change owner
       throw_unless(401, equal_slices(sender_address, owner_address));
       slice new_owner = in_msg_body~load_msg_addr();
@@ -184,9 +140,8 @@ slice calculate_nft_item_address(int wc, cell state_init) {
                             .store_ref(nft_content)
                            .end_cell();
 
-        ;; deployment of NFT that proofs ownership of locked jettons
-        deploy_nft_item(next_item_index, nft_item_code, min_gas_for_mint, nft_message); 
-        
+        ;; deployment of NFT that proves ownership of locked jettons
+        deploy_nft_item(next_item_index, nft_item_code, min_gas_for_mint, nft_message);
         next_item_index += 1;
         save_data(owner_address, next_item_index, content, nft_item_code, royalty_params, jetton_address);
 
@@ -217,7 +172,7 @@ slice calculate_nft_item_address(int wc, cell state_init) {
         ;; check that lockup period is over
         int start_time = nft_content~load_uint(64);
         int now_time = now();
-        throw_unless(400, (now_time - start_time > fourteen_days));
+        throw_unless(400, (now_time - start_time > lockup_period));
 
         int stacked_amount = nft_content~load_coins();
 
@@ -274,7 +229,6 @@ cell get_nft_content(int index, cell individual_nft_content) method_id {
   return (begin_cell()
                       .store_uint(1, 8) ;; offchain tag
                       .store_slice(common_content)
-                      .store_ref(individual_nft_content)
           .end_cell());
 }
 
