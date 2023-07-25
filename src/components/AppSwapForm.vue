@@ -62,7 +62,7 @@ const swapJettons = async (leftJetton: string, rightJetton: string, amount: stri
           messages: [
               {
                 address: params.to.toString(),
-                amount: params.gasAmount.add(TonWeb.utils.toNano('0.2')),
+                amount: params.gasAmount.add(TonWeb.utils.toNano('0.03')),
                 payload: bytesToBase64(await params.payload.toBoc()),
               }
           ]

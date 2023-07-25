@@ -58,5 +58,7 @@ export const loadTransferNotification = (
 
 // parseBocBase64('te6cckECAwEAASkAAZy4BhDUtLNN7WHrok9mtfoNlW88tbDknxwNISF93aFRHvz2eJIYEbyXCavIET/6eLwQUlGXeKc+o5xSYvXQiXEBKamjF2StPBcAAAHcAAMBAdNiADt3BW0qwi2ouZa0VVtB+ItsTRR0reXdrNlHeXz4Q1KUIO5rKAAAAAAAAAAAAAAAAAAAD4p+pQAAAAAAADA5MBhqCADvO5kConGyoByJOKUjz+JOcYR6rramIAAe1Ep3rA5wnBA/LlEDAgDRJZOFYYAQ9yRINU1K++Yk4owYITipv7MTQ11AZewg+ljLrdEPOcEALL+ORb5p4vzy96Yimh59V//z6FNKD8JDrClmJ90l0NRwA7EHhSlJYfIhYxf+w8lAO49GOpLyOAhRF4lOxne6kIJKui5UtQ==');
 export const coinsToNumber = (value: string, decimals?: number) => {
+  if (value === "") return "";
+
   return Number(Coins.fromNano(value, decimals).toString()).toFixed(2);
 };
