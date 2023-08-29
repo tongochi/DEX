@@ -14,7 +14,7 @@ async function main(jettonAmount: string) {
                     .storeAddress(walletAddress)  // sender address 
                     .storeUint(0, 1)
                     .storeCoins(toNano('0.1'))
-                    .storeUint(0, 1)
+                    .storeUint(1, 64)
                 .endCell()
 
     await walletContract.sendTransfer({
@@ -40,4 +40,4 @@ function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-main("48");
+main("1");

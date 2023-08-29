@@ -10,9 +10,9 @@ async function main(nftToReturnAddress: string) {
                     .storeUint(0x5fcc3d14, 32)
                     .storeUint(Date.now(), 64)
                     .storeAddress(Address.parse(collectionAddress))
-                    .storeAddress(null)
+                    .storeAddress(walletAddress)
                     .storeBit(false)  // no custom payload
-                    .storeCoins(toNano('0.25'))  // most will be returned
+                    .storeCoins(toNano('0.15'))  // most will be returned
                     .storeBit(false)  // no forward payload
                 .endCell();
 
@@ -21,7 +21,7 @@ async function main(nftToReturnAddress: string) {
             seqno: seqno,
             messages: [internal({
                 to: nftToReturnAddress,
-                value: toNano("0.3"),  // most will be returned
+                value: toNano("0.25"),  // most will be returned
                 body: msgBody,  
                 bounce: true
             })]
@@ -39,4 +39,4 @@ function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-main("EQC1fmOozv3Mo5OlxGOz4l10wnrEHPwn2LnvMSqhP0GZWT1M");
+main("EQCFNk3AktRMWKLqldoYtZaslE9yv4OoOzbAAq9zEjE3mQ09");
