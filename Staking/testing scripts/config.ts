@@ -10,17 +10,17 @@ const WalletContractV = WalletContractV3R2;  // contract version of your wallet
 export async function get_wallet_info() {
 
     // client for working with http
-    const endpoint = await getHttpEndpoint({network: "testnet"});
+    const endpoint = await getHttpEndpoint({network: "mainnet"});
     const client = new TonClient({endpoint});
 
-    const key = await mnemonicToWalletKey(mnemonic.split(' '));  
+    const key = await mnemonicToWalletKey(mnemonic.split(' '));
     const wallet = WalletContractV.create({publicKey: key.publicKey, workchain: 0});
     const walletContract = client.open(wallet);
     const walletAddress = wallet.address;  // main wallet address
 
     return {key, walletContract, walletAddress};
 }
-   
+
 
 // addresses
 export const jettonWalletAddress = "";  // jetton wallet address of your wallet

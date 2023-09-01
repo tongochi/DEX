@@ -15,8 +15,8 @@
 #include "imports/op-codes.fc";
 
 const int min_gas_for_mint = 50000000;  ;; 0.05 TON
-const int min_gas_for_jetton_transfer = 120000000;  ;; 0.1 TON
-
+const int min_gas_for_jetton_transfer = 110000000;  ;; 0.1 TON
+const int lockup_period_const = 60 * 60 * 24 * 14; ;; lockup period in seconds
 
 (slice, int, cell, cell, cell, slice) load_data() inline {
   var ds = get_data().begin_parse();
@@ -94,7 +94,7 @@ slice calculate_nft_item_address(int wc, cell state_init) {
       return ();
     }
 
-    ;; custom op-codes for farming
+    ;; custom op-codes for staking
 
     ;; op-code for save new jetton_wallet_address in storage
     if (op == 4) {
@@ -115,7 +115,7 @@ slice calculate_nft_item_address(int wc, cell state_init) {
         slice from_address = in_msg_body~load_msg_addr();
         int lockup_period = in_msg_body~load_uint(64);
         int now_time = now();
-
+        ;; throw_unless(404, lockup_period == lockup_period_const)  ;; uncomment for fixed lockup period
         ;; TODO change this to a human-read NFT content
         cell nft_content = begin_cell()
                             .store_uint(now_time, 64)  ;; start time
@@ -155,7 +155,7 @@ slice calculate_nft_item_address(int wc, cell state_init) {
         int now_time = now();
 
         ;; check that lockup period is over
-        if (now_time < end_time) {   
+        if (now_time < end_time) {   ;; if not - return nft back to user
             var new_msg_body = begin_cell()
                                 .store_uint(op::transfer(), 32)
                                 .store_uint(query_id, 64)
@@ -174,12 +174,12 @@ slice calculate_nft_item_address(int wc, cell state_init) {
                         .store_ref(new_msg_body);
             send_raw_message(msg.end_cell(), 64); 
         }
-
-        else {
+        else {  ;; unstake
+            ;; burn nft after unstaking
             var burn_msg = begin_cell()
                 .store_uint(0x18, 6)
                 .store_slice(sender_address)
-                .store_coins(20000000)
+                .store_coins(10000000)
                 .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
                 .store_uint(op::burn(), 32)
                 .store_uint(query_id, 64)
@@ -187,8 +187,8 @@ slice calculate_nft_item_address(int wc, cell state_init) {
 
             send_raw_message(burn_msg.end_cell(), 0); 
 
+            ;; and send jettons back
             int stacked_amount = nft_content~load_coins();
-
             var new_msg_body = begin_cell()
                                 .store_uint(op::transfer_jetton(), 32)
                                 .store_uint(query_id, 64)
@@ -254,7 +254,7 @@ cell get_nft_content(int index, cell individual_nft_content) method_id {
     } until (null?(chars));
     
     return (begin_cell()
-                .store_uint(1, 8) ;; offchain tag
+                .store_uint(1, 8)  ;; offchain tag
                 .store_slice(common_content)
                 .store_ref(string.store_slice(".json").end_cell())
             .end_cell());
