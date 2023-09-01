@@ -1,0 +1,40 @@
+version: "3.7"
+
+services:
+  web:
+    build: .
+    command: python /code/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    environment:
+      PG_DATABASE: staking
+      PG_USER: postgres
+      PG_PASSWORD: 1234
+      PG_HOST: db
+      PG_PORT: 5432
+      TONAPI_TOKEN: ''
+      TONAPI_REQUESTS: 6
+      TON_JUSDT_POOL: EQAKleHU6-eGDQUfi4YXMNve4UQP0RGAIRkU4AiRRlgDUbaM
+      PET_COLLECTION: EQArhEFS4oAqBGxH8GEwUNpZBivM8moF5sEaBXxM6X3v6NAj
+      PET_WALLET: EQDi3BugGhUWonFcmLi3Er6snibn-23lU0jH0DrI_Actij0x
+      LP_PET_TON_COLLECTION: EQDKl8cxbDbSOqHv7hq1JX_IID-YzfLhS2zLuOlfgI1NR_FO
+      LP_PET_TON_WALLET: EQBEBtOl0Qg9XKfTHK4ysFfoM_6JhaUK5lZWQBhQIgzQ2bDP
+      TONGOCHI_DB_NAME: name
+      TONGOCHI_DB_USER: user
+      TONGOCHI_DB_PASS: pass
+      TONGOCHI_DB_HOST: 127.0.0.1
+      TONGOCHI_DB_PORT: 5432
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    # network_mode: host
+  db:
+    image: "postgres:15.3"
+    ports:
+      - "15432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=staking
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_HOST_AUTH_METHOD=trust
