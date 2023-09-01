@@ -3,7 +3,7 @@
 This repository consists of two sections: <a href="https://github.com/tongochi/DEX/tree/develop/Swaps">Swaps</a>
 and <a href="https://github.com/tongochi/DEX/tree/develop/Staking">Staking</a>. In swaps directory there is the complete
 code of <a href="https://api.tongochi.org/dexf">swaps web page</a>. In Staking section, there are smart contracts for
-lockup NFT collection and backend of staking web page.
+lockup NFT collection and backend of <a href="https://api.tongochi.org/staking">staking web page</a>.
 
 ## Staking
 
@@ -112,7 +112,7 @@ staked PET and 1.25 point for 1 usd value of staked LP PET-TON every minute)
 - **Instant updates** of all staker and pool data after any contract interactions, thanks
   to [tonconsole streaming API](https://docs.tonconsole.com/tonapi/streaming-api#websocket).
 
-- **Calculating USD equivalents** of jettons & LP tokens by calling get methods of ston.fi liquidity pools contracts (we
+- **Calculating USD equivalents** of jettons & Ston.fi LP tokens by calling get methods of liquidity pools contracts (we
   use TON-JETTON pool to get TON value of jetton/LP token, then TON-USDT pool to get estimated USD value of TON). Will
   add Dedust LP tokens soon.
 
