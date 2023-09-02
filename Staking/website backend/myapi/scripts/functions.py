@@ -7,10 +7,10 @@ from config import *
 
 
 def getTonEqivalentJetton(
-        poolAddress: str,
-        jettonAmount: int,
-        testnet: bool = False,
-        cooldown: float = 1,
+    poolAddress: str,
+    jettonAmount: int,
+    testnet: bool = False,
+    cooldown: float = 1,
 ) -> float:
     get_url = GET_METHOD_URL_TESTNET if testnet else GET_METHOD_URL
     url = get_url(poolAddress) + "get_pool_data"
@@ -29,10 +29,10 @@ def getTonEqivalentJetton(
 
 
 def getTonEqivalentLp(
-        poolAddress: str,
-        LpAmount: int,
-        testnet: bool = False,
-        cooldown: float = 1,
+    poolAddress: str,
+    LpAmount: int,
+    testnet: bool = False,
+    cooldown: float = 1,
 ) -> float:
     get_url = GET_METHOD_URL_TESTNET if testnet else GET_METHOD_URL
     url = get_url(poolAddress) + "get_pool_data"
@@ -70,9 +70,9 @@ def getUsdEqivalent(tonAmount: float, cooldown: float = 1) -> float:
 
 
 def getJettonAmount(
-        jettonWalletAddress: str,
-        testnet: bool = False,
-        cooldown: float = 1,
+    jettonWalletAddress: str,
+    testnet: bool = False,
+    cooldown: float = 1,
 ) -> int:
     get_url = GET_METHOD_URL_TESTNET if testnet else GET_METHOD_URL
     base_url = get_url(jettonWalletAddress)
@@ -90,9 +90,9 @@ def getJettonAmount(
 
 
 def getNftContent(
-        nftAddress: str,
-        testnet: bool = False,
-        cooldown: float = 1,
+    nftAddress: str,
+    testnet: bool = False,
+    cooldown: float = 1,
 ) -> Literal[0] | tuple[int, int, int, int]:
     get_url = GET_METHOD_URL_TESTNET if testnet else GET_METHOD_URL
     url = get_url(nftAddress) + "get_nft_content"
@@ -113,11 +113,11 @@ def getNftContent(
 
 
 def getStakerData(
-        userAddress: str,
-        contractAddress: str,
-        testnet: bool = False,
-        cooldown: float = 0.2,
-        prev_nfts: list = []
+    userAddress: str,
+    contractAddress: str,
+    testnet: bool = False,
+    cooldown: float = 0.2,
+    prev_nfts: list = []
 ) -> tuple[float, list[dict]]:
     base_url = TONAPI_URL_TESTNET if testnet else TONAPI_URL
     url = f"{base_url}accounts/{userAddress}/nfts?collection={contractAddress}"
