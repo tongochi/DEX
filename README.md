@@ -13,7 +13,7 @@ lockup NFT collection and backend of <a href="https://api.tongochi.org/staking">
 
 Directory with all smart contracts. It includes:
 
-- **lockup_nft_collection.fc** - main contract and the only contract you should deploy by yourself.
+- **lockup_collection_1.fc** and **lockup_collection_2.fc** - two versions of the main contract (second has onchain rewards).
 
 - **nft_item.fc** - contract of NFT item from lockup NFT collection.
 
@@ -49,7 +49,8 @@ per smart contract instance.
 
 **To lock your tokens, you need:**
 
-- Deploy the contract
+- Deploy the contract (you can find out more info about state init parameters in smc code. For version with onchain 
+  rewards note that royalty params have the custom structure)
 
 - Find the jetton wallet address of the contract. You can get this by sending any amount of jettons to the contract and
   looking up the address on https://testnet.tonscan.org/address/{SMART_CONTRACT_ADDRESS}#tokens
@@ -57,6 +58,9 @@ per smart contract instance.
 - Change the jetton_wallet_address by sending an internal message to the smart contract (you can use the
   changeJettonAddress script). This variable contains the address of the jetton wallet, in which locked jettons will be
   stored.
+
+- If you are using the version with on-chain rewards, then replanish the reward pool with the amount you need (you can use
+  the addRewards script).
 
 - Send jettons to the contract with msgValue and fwdAmount greater than 0.1 TON (you can use the lockTokens script)
 
@@ -72,22 +76,34 @@ times and amount of locked jettons are stored on-chain in the NFT-item contract 
   returnTokens script)
 
 The NFT collection contract will check that you sent a valid NFT and that the lock period has ended. If everything
-checks out, the tokens will be returned to your wallet and the NFT will be burned.
+checks out, the tokens will be returned to your wallet and the NFT will be burned. In the version with on-chain 
+rewards, you will receive <code>staking_factor / staking_base</code> jettons in addition to locked ones.
 
 #### Special features
 
 - **Ability to lock any tokens** (tokens with different addresses should be locked in different contract instances).
 
-- **Returning the NFT** back to user if it was sent to the smart contract before the lockup period ended.
+- **On-chain rewards** with a fixed interest rate.
 
 - **Storing NFT content on-chain**, while duplicating it off-chain, so users can see it in Tonkeeper or Getgems but also
   be assured it cannot be modified.
+
+- **Returning the NFT** back to user if it was sent to the smart contract before the lockup period ended.
 
 - **Burning NFTs after unstaking** (entire NFT balance is transferred to owner during this operation).
 
 - **Notifications when each NFT is transferred**: NFT contract sends 0.01 TON to collection address with special opcode,
   previous owner address and new owner address, **which is extremely useful** for tracking all transactions of NFTs from
   one collection.
+
+### Monetization
+
+Our smart contracts allow locking any tokens, so we plan to make our site a place where anyone can create a staking pool 
+with on-chain rewards. In return, we will charge royalties in the form of a percentage of the rewards allocated by the 
+project for stakers, as well as a percentage of the TVL of the pool. When creating a smart contract, royalty parameters can
+be configured, so the percentage fee will depend on the total amount of funds that the project Will allocate for user
+rewards. All fees will be collected from the fees pool, which the project must replenish before launching the staking
+program. 
 
 ### Off-chain rewards
 
@@ -97,8 +113,8 @@ from +3, there is a chance the item will be destroyed during improvement (even N
 Items level +5 and above, when destroyed, go into a database where players can retrieve them using a developer coupon.
 This database stores the last 100 broken +5 level items from all Tongochi players, on a first-in-first-out basis.
 
-Developer coupons are earned by staking on the Tongochi staking page or using the Tongochi swapper. Users receive
-developer points for these actions that can be exchanged for a coupon.
+Developer coupons are earned by staking PET or LP PET-TON jettons on the Tongochi staking page or using the Tongochi 
+swapper. Users receive developer points for these actions that can be exchanged for a coupon.
 
 ### Website backend
 
