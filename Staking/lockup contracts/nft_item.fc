@@ -151,7 +151,16 @@ int min_tons_for_storage() asm "50000000 PUSHINT"; ;; 0.05 TON
     }
     if (op == op::burn()) {  ;; burn nft after unstaking
         throw_unless(405, equal_slices(collection_address, sender_address));
-        var msg = begin_cell()
+
+        var msg_1 = begin_cell()
+                        .store_uint(0x10, 6) 
+                        .store_slice(collection_address)  ;; collection address
+                        .store_coins(10000000)
+                        .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
+                        .end_cell();
+        send_raw_message(msg_1, 1);
+
+        var msg_2 = begin_cell()
                     .store_uint(0x10, 6) 
                     .store_slice(in_msg_body~load_msg_addr())  ;; previous owner address
                     .store_coins(0)
@@ -159,7 +168,8 @@ int min_tons_for_storage() asm "50000000 PUSHINT"; ;; 0.05 TON
                     .store_uint(0, 32)
                     .store_slice("Your jettons were returned, check your balance")
                   .end_cell();
-        send_raw_message(msg, 128 + 32);
+        send_raw_message(msg_2, 128 + 32);
+        
         return ();
     }
     if (op == op::get_static_data()) {

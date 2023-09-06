@@ -183,7 +183,7 @@ slice calculate_nft_item_address(int wc, cell state_init) {
                 .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
                 .store_uint(op::burn(), 32)
                 .store_uint(query_id, 64)
-                .store_slice(sender_address);
+                .store_slice(from_address);
 
             send_raw_message(burn_msg.end_cell(), 0); 
 
