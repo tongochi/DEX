@@ -11,7 +11,7 @@ from .models import Pool, Staker
 class MethodsView(APIView):
     def get(self, request: Request):
         possible_urls = list(map(lambda x: "https://api.tongochi.org/stakingapi/" + x,
-                                 ["pools/", "stakers/", "dev-points/", "nft/content/"]))
+                                     ["pools/", "stakers/", "dev-points/", "nft/content/"]))
         return Response(status=200, data={"Possible urls:": possible_urls})
 
 

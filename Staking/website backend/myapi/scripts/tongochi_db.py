@@ -17,6 +17,7 @@ __tongochi_db_connection = psycopg2.connect(
     host=TONGOCHI_DB_HOST,  # type: ignore
     port=TONGOCHI_DB_PORT,  # type: ignore
 )
+__tongochi_db_connection.autocommit = True
 
 
 def add_developer_points(
@@ -34,12 +35,12 @@ def add_developer_points(
                 (CAST((%(current_time)s - DeveloperPoints.last_update_time) AS bigint) * %(amount)s) / CAST(60 AS bigint)
             ),
             last_update_time = %(current_time)s,
-            last_update_amount = %(amount)s
+            last_update_amount = (CAST((%(current_time)s - DeveloperPoints.last_update_time) AS bigint) * %(amount)s) / CAST(60 AS bigint)
         WHERE DeveloperPoints.last_update_time + %(timeout)s <= %(current_time)s
         AND DeveloperPoints.owner_wallet = %(owner_wallet)s;
     """
 
-    TIMEOUT: int = 5 * 60  # 5 Minutes
+    TIMEOUT: int = 10 * 60  # 5 Minutes
     current_time = int(time.time())
 
     vars_ = {
@@ -51,7 +52,7 @@ def add_developer_points(
 
     with __tongochi_db_connection.cursor() as cursor:
         cursor.execute(query, vars_)
-        __tongochi_db_connection.commit()
+        # __tongochi_db_connection.commit()
 
 
 def get_developer_points(
@@ -119,7 +120,7 @@ def insert_staking_nft_item(
         if cursor.fetchone():
             print(f"item with id={index} already exists in {table_name} but ok")
             cursor.execute(f"DELETE FROM {table_name} WHERE id={index}")
-            __tongochi_db_connection.commit()
+            # __tongochi_db_connection.commit()
 
     query = f"""
         INSERT INTO {table_name} VALUES (%(index)s, %(address)s, %(name)s,
@@ -143,12 +144,12 @@ def insert_staking_nft_item(
             {"trait_type": "Lockup period", "value": lockup_period_attr},
             {"trait_type": "Staked amount", "value": staked_amount_attr}
         ]),
-        'image': "https://raw.githubusercontent.com/ArkadiyStena/testJson/main/nft-content/nft-image.png"
+        'image': f"https://raw.githubusercontent.com/ArkadiyStena/testJson/main/nft-content/{jetton_name}-image.png"
     }
 
     with __tongochi_db_connection.cursor() as cursor:
         cursor.execute(query, vars_)
-        __tongochi_db_connection.commit()
+        # __tongochi_db_connection.commit()
 
 
 def deactivate_nft_item(
@@ -181,7 +182,7 @@ def deactivate_nft_item(
 
     with __tongochi_db_connection.cursor() as cursor:
         cursor.execute(query, vars_)
-        __tongochi_db_connection.commit()
+        # __tongochi_db_connection.commit()
 
 
 def get_nft_item(collection: str, index: int) -> dict:

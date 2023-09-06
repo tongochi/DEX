@@ -51,6 +51,31 @@ def getTonEqivalentLp(
     except Exception as e:
         print(e, 'tvlLp')
         return 0
+   
+
+def getTonEquivalent(
+    jetton_type: str,
+    ston_fi_pool: str,
+    amount: float | int,
+    testnet: bool,
+    cooldown: float = 1,
+) -> float:
+    if jetton_type == "Jetton":
+        ton_eqivalent = getTonEqivalentJetton(
+            poolAddress=ston_fi_pool,
+            jettonAmount=amount,
+            testnet=testnet,
+            cooldown=cooldown,
+        )
+    else:
+        ton_eqivalent = getTonEqivalentLp(
+            poolAddress=ston_fi_pool,
+            LpAmount=amount,
+            testnet=testnet,
+            cooldown=cooldown,
+        )
+
+    return ton_eqivalent
 
 
 def getUsdEqivalent(tonAmount: float, cooldown: float = 1) -> float:

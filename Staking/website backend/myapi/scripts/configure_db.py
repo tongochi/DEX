@@ -29,20 +29,28 @@ poolPet = [
     "'PET'",
     f"'{os.environ['PET_COLLECTION']}'",
     f"'{os.environ['PET_WALLET']}'",
-    "'EQB3-eMJDlGP5ZpwTmfakZGhBXAI_jBzJmqhU_CmpIx3nFo-'",
+    f"'{os.environ['PET_POOL']}'",
     "'Jetton'",
-    "False",
+    "False"
 ]
 poolLp = [
     "'LP-PET-TON'",
     f"'{os.environ['LP_PET_TON_COLLECTION']}'",
     f"'{os.environ['LP_PET_TON_WALLET']}'",
-    "'EQB3-eMJDlGP5ZpwTmfakZGhBXAI_jBzJmqhU_CmpIx3nFo-'",
+    f"'{os.environ['PET_POOL']}'",
     "'LP'",
-    "False",
+    "False"
+]
+poolLave = [
+    "'LAVE'",
+    f"'{os.environ['LAVE_COLLECTION']}'",
+    f"'{os.environ['LAVE_WALLET']}'",
+    f"'{os.environ['LAVE_POOL']}'",
+    "'Jetton'",
+    "False"
 ]
 
-for pool in (poolPet, poolLp):
+for pool in (poolPet, poolLp, poolLave):
     query = f"""
         INSERT INTO myapi_pool (
             name,

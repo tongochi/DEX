@@ -14,8 +14,8 @@ from functions import *
 from time import time
 from json import loads, dumps
 from threading import Thread
-from tonsdk.utils import Address
-from tonsdk.boc import Cell, Slice
+from tonsdk.utils import Address  # type: ignore
+from tonsdk.boc import Cell, Slice  # type: ignore
 
 
 conn = psycopg2.connect(
@@ -25,10 +25,24 @@ conn = psycopg2.connect(
     host=DB_HOST,  # type: ignore
     port=DB_PORT  # type: ignore
 )
+conn.autocommit = True
 cursor = conn.cursor()
 
-last_update_devpoints = 0
-timeout = 10 * 60  # Minutes
+
+def getJettonPrices() -> dict[str, float]:
+    cursor.execute("""
+        SELECT
+            name,
+            "stonfiPoolAddress",
+            "jettonType"
+        FROM myapi_pool
+    """)
+    pools = cursor.fetchall()
+    jetton_prices: dict[str, float] = {}
+    for elem in pools:
+        pool_name, ston_fi_pool, jetton_type = elem
+        jetton_prices[pool_name] = getTonEquivalent(jetton_type, ston_fi_pool, 10 ** 9, False, 0)
+    return jetton_prices
 
 
 def updateNftCollections(cooldown: float = 1):
@@ -63,41 +77,15 @@ def updateNftCollections(cooldown: float = 1):
 
 
 def updatePools(cooldown: float = 1):
-    cursor.execute("""
-        SELECT
-            name,
-            "jettonWalletAddress",
-            "stonfiPoolAddress",
-            "jettonType",
-            testnet
-        FROM myapi_pool
-    """)
+    cursor.execute(""" SELECT name, "jettonWalletAddress", testnet FROM myapi_pool """)
     pools = cursor.fetchall()
-
+    jettonPrices = getJettonPrices()
+    oneTon = getUsdEqivalent(1, cooldown)
     for pool in pools:
-        pool_name, jetton_wallet, ston_fi_pool, jetton_type, testnet = pool
-        jettonTvl = getJettonAmount(
-            jettonWalletAddress=jetton_wallet,
-            testnet=testnet,
-            cooldown=cooldown
-        )
-
-        if jetton_type == "LP":
-            tonTvl = getTonEqivalentLp(
-                poolAddress=ston_fi_pool,
-                LpAmount=jettonTvl,
-                testnet=testnet,
-                cooldown=cooldown,
-            )
-        else:
-            tonTvl = getTonEqivalentJetton(
-                poolAddress=ston_fi_pool,
-                jettonAmount=jettonTvl,
-                testnet=testnet,
-                cooldown=cooldown,
-            )
-
-        usdTvl = getUsdEqivalent(tonTvl, cooldown=cooldown)
+        poolName, jettonWallet, testnet = pool
+        jettonTvl = getJettonAmount(jettonWallet, testnet, cooldown)
+        tonTvl = jettonTvl / 10 ** 9 * jettonPrices[poolName]
+        usdTvl = tonTvl * oneTon
 
         if usdTvl > 100:
             usdTvl = int(usdTvl)
@@ -107,18 +95,17 @@ def updatePools(cooldown: float = 1):
             tonTvl = round(tonTvl, 1)
 
         if usdTvl != 0:
-            print(f'update {pool_name} tvls', jettonTvl, tonTvl, usdTvl)
+            print(f'update {poolName} tvls', jettonTvl, tonTvl, usdTvl)
             cursor.execute(f"""
                 UPDATE myapi_pool
                 SET
                     "jettonTvl" = {jettonTvl},
                     "tonTvl" = {tonTvl},
                     "usdTvl" = {usdTvl}
-                WHERE name = '{pool_name}'
+                WHERE name = '{poolName}'
             """)
-            conn.commit()
         else:
-            print('usdTvl = ', usdTvl, " skipping updating pool tvl")
+            print(f'{poolName} usdTvl = ', usdTvl, " skipping updating pool tvl")
 
 
 def addStakers(cooldown: float = 1):
@@ -126,18 +113,18 @@ def addStakers(cooldown: float = 1):
     stakers = cursor.fetchall()
 
     if stakers:
-        last_id = max(stakers, key=lambda t: t[0])[0]
+        lastId = max(stakers, key=lambda t: t[0])[0]
     else:
-        last_id = 0
+        lastId = 0
 
     stakersByPool: dict[str, set[str]] = {}
     for staker in stakers:
-        _, pool_name, staker_address = staker
+        _, poolName, stakerAddress = staker
 
-        if pool_name not in stakersByPool:
-            stakersByPool[pool_name] = {staker_address}
+        if poolName not in stakersByPool:
+            stakersByPool[poolName] = {stakerAddress}
         else:
-            stakersByPool[pool_name].add(staker_address)
+            stakersByPool[poolName].add(stakerAddress)
 
     stakersToDelete = []
     stakersToAdd = []
@@ -147,9 +134,9 @@ def addStakers(cooldown: float = 1):
     pools = cursor.fetchall()
 
     for pool in pools:
-        pool_name, contract_address, testnet = pool
+        poolName, contractAddress, testnet = pool
 
-        availablePools.append(pool_name)
+        availablePools.append(poolName)
 
         base_url = TONAPI_URL_TESTNET if testnet else TONAPI_URL
 
@@ -157,7 +144,7 @@ def addStakers(cooldown: float = 1):
         offset = 0
 
         while True:
-            url = f'{base_url}nfts/collections/{contract_address}/items?offset={offset}'
+            url = f'{base_url}nfts/collections/{contractAddress}/items?offset={offset}'
             items_slice = get(url, headers=AUTH_HEADER).json()["nft_items"]
             items.extend(items_slice)
 
@@ -171,18 +158,18 @@ def addStakers(cooldown: float = 1):
         holders = set()
         for item in items:
             holderAddress = Address(item["owner"]["address"]).to_string(True, True, True)
-            if holderAddress != contract_address:
+            if holderAddress != contractAddress:
                 holders.add(holderAddress)
 
         for staker in stakers:
-            staker_id, staker_pool, staker_address = staker
-            if staker_pool == pool_name and staker_address not in holders:
-                stakersToDelete.append(staker_id)
+            stakerId, stakerPool, stakerAddress = staker
+            if stakerPool == poolName and stakerAddress not in holders:
+                stakersToDelete.append(stakerId)
 
         for holder in holders:
-            if pool_name not in stakersByPool or holder not in stakersByPool[pool_name]:
-                last_id += 1
-                stakersToAdd.append(f"({last_id}, '{holder}', '{pool_name}', {testnet})")
+            if poolName not in stakersByPool or holder not in stakersByPool[poolName]:
+                lastId += 1
+                stakersToAdd.append(f"({lastId}, '{holder}', '{poolName}', {testnet})")
 
     for pool in stakersByPool:
         if pool not in availablePools:
@@ -200,100 +187,62 @@ def addStakers(cooldown: float = 1):
             INSERT INTO myapi_staker (id, "stakerAddress", "poolName", testnet)
             VALUES {', '.join(stakersToAdd)}
         """)
-    conn.commit()
 
 
-def get_ton_equivalent(
-    jetton_type: str,
-    ston_fi_pool: str,
-    amount: float | int,
-    testnet: bool,
-    cooldown: float,
-) -> float:
-    if jetton_type == "Jetton":
-        ton_eqivalent = getTonEqivalentJetton(
-            poolAddress=ston_fi_pool,
-            jettonAmount=amount,
-            testnet=testnet,
-            cooldown=cooldown,
-        )
-    else:
-        ton_eqivalent = getTonEqivalentLp(
-            poolAddress=ston_fi_pool,
-            LpAmount=amount,
-            testnet=testnet,
-            cooldown=cooldown,
-        )
-
-    return ton_eqivalent
-
-
-def add_developer_points(
-    staker_address: str,
-    pool_name: str,
-    ton_equivalent: int,
-    staker_data: tuple[float, list[dict]],
-    cooldown: float,
-) -> None:
+def updateDeveloperPoints(cooldown: float) -> None:
+    jettonPrices = getJettonPrices()
+    oneTon = getUsdEqivalent(1, cooldown)
+    cursor.execute("""SELECT "stakerAddress", "poolName", "stakerNftItems" FROM myapi_staker""")
+    stakers = cursor.fetchall()
     NUMBER_OF_SECONDS_IN_DAY = 86400
-    _, nfts = staker_data
+    pointsByAddress = {}
+    for staker in stakers:
+        staker_address, pool_name, nfts = staker
+        stakerBalance = 0
+        for nft in nfts:
+            if nft['lockupPeriod'] >= 14 * NUMBER_OF_SECONDS_IN_DAY:
+                stakerBalance += nft['nftBalance']
+        multiplier = {
+            'PET': 100,
+            'LP-PET-TON': 150,
+        }.get(pool_name, 0) / 100
+        pointsToAdd = stakerBalance / 10 ** 9 * jettonPrices[pool_name] * oneTon * multiplier
+        curPoints = pointsByAddress.get(staker_address, 0)
+        pointsByAddress[staker_address] = curPoints + pointsToAdd
 
-    balance = 0
-    for nft in nfts:
-        if nft['lockupPeriod'] >= 14 * NUMBER_OF_SECONDS_IN_DAY:
-            balance += nft['nftBalance']
-
-    usd_equivalent = getUsdEqivalent(ton_equivalent, cooldown=cooldown)
-
-    multiplier = {
-        'PET': 100,
-        'LP-PET-TON': 125,
-    }.get(pool_name, 100)
-
-    amount_of_points = int((usd_equivalent / 100) * multiplier)
-
-    if amount_of_points > 0:
-        tongochi_db.add_developer_points(
-            wallet_address=staker_address,
-            amount=amount_of_points,
-        )
+    for staker_address in pointsByAddress:
+        amountOfPoints = int(pointsByAddress[staker_address])
+        if amountOfPoints > 0:
+            tongochi_db.add_developer_points(wallet_address=staker_address, amount=amountOfPoints)
 
 
 def updateStakers(cooldown: float = 0.2, initial=False):
+    cursor.execute(""" SELECT name, "contractAddress" FROM myapi_pool """)
+    pools = cursor.fetchall()
+    nameToContract: dict[str, str] = {pool[0]: pool[1] for pool in pools}
+
     cursor.execute("""
         SELECT
-            name,
-            "contractAddress",
-            "stonfiPoolAddress",
-            "jettonType",
-            testnet
-        FROM myapi_pool
+            id,
+            "poolName",
+            "stakerAddress",
+            "stakedJettons",
+            "stakerNftItems"
+        FROM myapi_staker
     """)
-    pools = cursor.fetchall()
-
-    nameToPool: dict[str, tuple] = {pool[0]: pool for pool in pools}
-
-    cursor.execute("""SELECT id, "poolName", "stakerAddress", "stakedJettons",
-                   "tonEquivalent", "stakerNftItems" FROM myapi_staker""")
     stakers = cursor.fetchall()
-
-    global last_update_devpoints
-    if last_update_devpoints + timeout <= int(time()):
-        update_devpoints = True
-        last_update_devpoints = int(time())
-    else:
-        update_devpoints = False
+    jettonPrices = getJettonPrices()
 
     for staker in stakers:
-        staker_id, staker_pool_name, staker_address, stakedJettons, tonEquivalent, prev_nfts = staker
+        staker_id, staker_pool_name, staker_address, stakedJettons, prev_nfts = staker
         prev_nfts = prev_nfts if prev_nfts else []
 
-        pool_name, contract_address, ston_fi_pool, jetton_type, testnet = nameToPool[staker_pool_name]
+        contract_address = nameToContract[staker_pool_name]
         if initial:
             staker_data = getStakerData(
                 userAddress=staker_address,
                 contractAddress=contract_address,
-                testnet=testnet,
+                testnet=False,
                 cooldown=cooldown,
                 prev_nfts=prev_nfts
             )
@@ -301,23 +250,8 @@ def updateStakers(cooldown: float = 0.2, initial=False):
         else:
             nfts = prev_nfts
 
-        tonEquivalent = get_ton_equivalent(
-            jetton_type=jetton_type,
-            ston_fi_pool=ston_fi_pool,
-            amount=stakedJettons,
-            testnet=testnet,
-            cooldown=cooldown,
-        )
-        tonEquivalent = round(tonEquivalent, 2) if tonEquivalent else 0
-
-        if update_devpoints:
-            add_developer_points(
-                staker_address=staker_address,
-                pool_name=pool_name,
-                ton_equivalent=tonEquivalent,
-                staker_data=(0, nfts),
-                cooldown=cooldown,
-            )
+        tonEquivalent = stakedJettons / 10 ** 9 * jettonPrices[staker_pool_name]
+        tonEquivalent = round(tonEquivalent, 2)
 
         if initial:
             cursor.execute(f"""
@@ -326,7 +260,7 @@ def updateStakers(cooldown: float = 0.2, initial=False):
                     "stakedJettons" = {stakedJettons},
                     "tonEquivalent" = {tonEquivalent},
                     "stakerNftItems" = '{dumps(nfts)}'::json
-                WHERE id={staker[0]}
+                WHERE id={staker_id}
             """)
         else:
             cursor.execute(f"""
@@ -335,7 +269,6 @@ def updateStakers(cooldown: float = 0.2, initial=False):
                     "tonEquivalent" = {tonEquivalent}
                 WHERE id={staker[0]}
             """)
-        conn.commit()
 
 
 def find_tx_by_hash(source: dict, hash: str):
@@ -370,9 +303,14 @@ def connect_to_websocket(connection_params: dict):
     return ws
 
 
-def reconnect_to_db():
+def reconnect_to_db_1():
     global conn
     global cursor
+    try:
+        cursor.close()
+        conn.close()
+    except:
+        pass
     conn = psycopg2.connect(
         dbname=DB_NAME,  # type: ignore
         user=DB_USER,  # type: ignore
@@ -380,6 +318,7 @@ def reconnect_to_db():
         host=DB_HOST,  # type: ignore
         port=DB_PORT  # type: ignore
     )
+    conn.autocommit = True
     cursor = conn.cursor()
 
 
@@ -448,7 +387,7 @@ def update_websocket():
                     if Address(nft_address_parsed).to_string(True, True, True) != nft_address:  # check that msg was send by nft from right collection
                         continue
 
-                    one_token = get_ton_equivalent(jetton_type, pool_stonfi, nft_balance, False, 0)
+                    one_token = getTonEquivalent(jetton_type, pool_stonfi, nft_balance, False, 0)
 
                     # update prev owner
                     cursor.execute(f"""SELECT id, "stakedJettons", "tonEquivalent", "stakerNftItems" FROM myapi_staker
@@ -488,7 +427,6 @@ def update_websocket():
                         cursor.execute(f"""UPDATE myapi_staker
                                         SET "stakedJettons"={staked_jettons}, "tonEquivalent"={staker_ton_equivalent},
                                             "stakerNftItems"='{dumps(staker_nfts)}'::json WHERE id={staker_id}""")
-                    conn.commit()
 
                 elif operation == OP_CODES["nft_ownership_assigned"]:
                     staker_address = Address(in_msg["decoded_body"]["prev_owner"]).to_string(True, True, True)
@@ -508,7 +446,7 @@ def update_websocket():
                     unlocked_jettons = int(jetton_transfer_message["decoded_body"]["amount"])
 
                     staker_id, staked_jettons, staker_ton_equivalent, staker_nfts = staker_data
-                    one_token = get_ton_equivalent(jetton_type, pool_stonfi, unlocked_jettons, False, 0)
+                    one_token = getTonEquivalent(jetton_type, pool_stonfi, unlocked_jettons, False, 0)
 
                     jetton_tvl -= unlocked_jettons
                     ton_tvl = jetton_tvl / 10 ** 9 * one_token
@@ -529,7 +467,6 @@ def update_websocket():
 
                     cursor.execute(f"""UPDATE myapi_pool SET "jettonTvl"={jetton_tvl}, "tonTvl"={ton_tvl}
                                     WHERE name='{pool_name}'""")
-                    conn.commit()
 
                     tongochi_db.deactivate_nft_item(pool_name + '_staking', address=nft_address)
 
@@ -553,7 +490,7 @@ def update_websocket():
                     nft_content_json = {"address": nft_address, "lockupStart": lockup_start,
                                         "lockupPeriod": lockup_period, "nftBalance": nft_balance}
 
-                    one_token = get_ton_equivalent(jetton_type, pool_stonfi, 10 ** 9, False, 0)
+                    one_token = getTonEquivalent(jetton_type, pool_stonfi, 10 ** 9, False, 0)
 
                     cursor.execute(f"""SELECT id, "stakedJettons", "tonEquivalent", "stakerNftItems" FROM myapi_staker
                                 WHERE "stakerAddress"='{staker_address}' AND "poolName"='{pool_name}'""")
@@ -579,7 +516,6 @@ def update_websocket():
                     ton_tvl = jetton_tvl / 10 ** 9 * one_token
                     cursor.execute(f"""UPDATE myapi_pool SET "jettonTvl"={jetton_tvl}, "tonTvl"={ton_tvl}
                                     WHERE name='{pool_name}'""")
-                    conn.commit()
 
                     tongochi_db.insert_staking_nft_item(pool_name, index, nft_address, lockup_start, lockup_period,
                                                         nft_balance)
@@ -589,11 +525,10 @@ def update_websocket():
             exit(0)
         except psycopg2.ProgrammingError as ex:
             print("database error: (ws)", ex)
-            conn.rollback()
             need_update = 1
         except psycopg2.InterfaceError as ex:
             print("database error: (ws)", ex)
-            reconnect_to_db()
+            reconnect_to_db_1()
             need_update = 1
         except Exception as ex:
             print("update_websocket error:", ex)
@@ -601,7 +536,13 @@ def update_websocket():
             traceback.print_exc()
             print('----')
             if not ws.connected:
-                ws = connect_to_websocket(connection_params)
+                while True:
+                    try:
+                        ws = connect_to_websocket(connection_params)
+                        break
+                    except Exception as ex:
+                        traceback.print_exc()
+                        sleep(10)
             need_update = 1
 
         if need_update:
@@ -622,14 +563,21 @@ def update_simple():
         try:
             updatePools(cd)
             updateStakers(cd)
+            updateDeveloperPoints(cd)
             sleep(120)
         except KeyboardInterrupt:
             exit(0)
+        except psycopg2.ProgrammingError as ex:
+            print("database error: (update simple)", ex)
+        except psycopg2.InterfaceError as ex:
+            print("database error: (update simple)", ex)
+            reconnect_to_db_1()
         except Exception as ex:
             print("update_simple error", ex)
             print('----')
             traceback.print_exc()
             print('----')
+
 
 
 if __name__ == "__main__":
