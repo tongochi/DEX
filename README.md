@@ -40,10 +40,10 @@ Directory with Django app that implements rest api.
 
 ### Lockup contracts info
 
-This smart contract implements locking up TON jettons for a variable or fixed period. It is based on
-the [NFT collection template](https://github.com/ton-blockchain/token-contract/tree/main/nft) from ton.org with the
-addition of handling custom opcodes and a "jetton wallet address" section in storage. You can lock only one jetton type
-per smart contract instance.
+This smart contract implements locking up TON jettons for a variable or fixed period (for version with onchain rewards 
+only fixed). It is based on the [NFT collection template](https://github.com/ton-blockchain/token-contract/tree/main/nft) 
+from ton.org with the addition of handling custom opcodes and a "jetton wallet address" section in storage. You can lock 
+only one jetton type per smart contract instance.
 
 ### Contract work pattern
 
@@ -103,7 +103,7 @@ with on-chain rewards. In return, we will charge royalties in the form of a perc
 project for stakers, as well as a percentage of the TVL of the pool. When creating a smart contract, royalty parameters can
 be configured, so the percentage fee will depend on the total amount of funds that the project Will allocate for user
 rewards. All fees will be collected from the fees pool, which the project must replenish before launching the staking
-program. 
+program. We are able to withdraw royalty jettons right after fees pool was refilled.
 
 ### Off-chain rewards
 
