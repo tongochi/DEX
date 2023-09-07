@@ -31,7 +31,8 @@ poolPet = [
     f"'{os.environ['PET_WALLET']}'",
     f"'{os.environ['PET_POOL']}'",
     "'Jetton'",
-    "False"
+    "False",
+    "1"
 ]
 poolLp = [
     "'LP-PET-TON'",
@@ -39,7 +40,8 @@ poolLp = [
     f"'{os.environ['LP_PET_TON_WALLET']}'",
     f"'{os.environ['PET_POOL']}'",
     "'LP'",
-    "False"
+    "False",
+    "1"
 ]
 poolLave = [
     "'LAVE'",
@@ -47,7 +49,8 @@ poolLave = [
     f"'{os.environ['LAVE_WALLET']}'",
     f"'{os.environ['LAVE_POOL']}'",
     "'Jetton'",
-    "False"
+    "False",
+    "2"
 ]
 
 for pool in (poolPet, poolLp, poolLave):
@@ -58,9 +61,9 @@ for pool in (poolPet, poolLp, poolLave):
             "jettonWalletAddress",
             "stonfiPoolAddress",
             "jettonType",
-            "testnet"
+            "testnet",
+            "category"
         ) VALUES ({', '.join(pool)})
     """
     cursor.execute(query)
-
-conn.commit()
+    

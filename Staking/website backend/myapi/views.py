@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
-
+from rest_framework.utils.serializer_helpers import ReturnList
 from .scripts import tongochi_db
 from .serializers import PoolSerializer, StakerSerializer
 from .models import Pool, Staker
@@ -28,7 +28,9 @@ class PoolView(APIView):
         else:
             res = Pool.objects.all()
             serializer = PoolSerializer(res, many=True)
-            return Response(status=200, data=serializer.data)
+            data: ReturnList = serializer.data
+            data.sort(key=lambda x: (-x.get("category"), x.get("tonTvl")), reverse=True)
+            return Response(status=200, data=data)
 
 
 class StakerView(APIView):
@@ -36,7 +38,7 @@ class StakerView(APIView):
     def get(self, request: Request):
         stakerAddress = request.GET.get("stakerAddress")
         poolName = request.GET.get("poolName")
-        res = Staker.objects.all()
+        res = Staker.objects.all().order_by('-tonEquivalent')
         if stakerAddress:
             res = res.filter(stakerAddress=stakerAddress)
         if poolName:

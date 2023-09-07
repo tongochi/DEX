@@ -11,6 +11,7 @@ class Pool(models.Model):
     tonTvl = models.FloatField(default=0)
     usdTvl = models.FloatField(default=0)
     testnet = models.BooleanField(default=False)
+    category = models.SmallIntegerField(default=2)
 
     def __str__(self):
         return self.name
