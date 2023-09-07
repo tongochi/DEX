@@ -550,6 +550,21 @@ def update_websocket():
                 updateNftCollections(1 / TONAPI_REQUESTS)
                 addStakers(1 / TONAPI_REQUESTS)
                 updateStakers(1 / TONAPI_REQUESTS, initial=True)
+                cursor.execute("""
+                    SELECT
+                        "contractAddress",
+                        name,
+                        "jettonWalletAddress",
+                        "stonfiPoolAddress",
+                        "jettonType",
+                        "jettonTvl",
+                        "tonTvl"
+                    FROM myapi_pool
+                """)
+                pools = cursor.fetchall()
+                pools_by_address = {}
+                for i in pools:
+                    pools_by_address[i[0]] = i[1:]
             except Exception:
                 print('----')
                 traceback.print_exc()
