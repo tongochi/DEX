@@ -11,3 +11,4 @@ int op::report_static_data() asm "0x8b771735 PUSHINT";
 int op::get_royalty_params() asm "0x693d3950 PUSHINT";
 int op::report_royalty_params() asm "0xa8cb00ad PUSHINT";
 int op::burn() asm "0x55521d04 PUSHINT";
+int op::nft_transferred() asm "0x9cf42a7d PUSHINT";
