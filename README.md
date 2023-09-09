@@ -152,3 +152,21 @@ staked PET and 1.25 point for 1 usd value of staked LP PET-TON every minute)
 
 Swaps is a vue.js app in which you can swap different tokens. It is based on the STON.fi javascript SDK. Users get
 developer points each time they use it.
+
+## Links
+**Website:**
+- [Main page](https://tongochi.org/)
+- [Staking](https://api.tongochi.org/staking)
+- [Swaps](https://api.tongochi.org/dexf) (will be remastered)
+
+**Game:**
+- [Telegram bot](https://t.me/TonGochi_bot)
+- [Web App](https://api.tongochi.org/auth/telegram)
+
+**Telegram channels:**
+- [English](https://t.me/tongochi_game)
+- [Russian](https://t.me/tongochi_ru)
+
+**Contacts:**
+- [@arkadiystena](https://t.me/arkadiystena) - for technical questions about this repository.
+- [@donlusofon](https://t.me/donlusofon) - for any other questions.
