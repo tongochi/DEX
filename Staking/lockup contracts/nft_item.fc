@@ -95,8 +95,9 @@ int min_tons_for_storage() asm "50000000 PUSHINT"; ;; 0.05 TON
 
     if (forward_amount) {
         send_msg(new_owner_address, forward_amount, op::ownership_assigned(), query_id, 
-                begin_cell().store_slice(owner_address).store_uint(index, 64).store_ref(content), 1);  ;; paying fees, revert on errors
+                    begin_cell().store_slice(owner_address).store_uint(index, 64).store_ref(content), 1);  ;; paying fees, revert on errors
     }
+
     if (need_response) {
         force_chain(response_destination);
         send_msg(response_destination, rest_amount, op::excesses(), query_id, null(), 1);  ;; paying fees, revert on errors
@@ -165,8 +166,8 @@ int min_tons_for_storage() asm "50000000 PUSHINT"; ;; 0.05 TON
                     .store_slice(in_msg_body~load_msg_addr())  ;; previous owner address
                     .store_coins(0)
                     .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
-                    .store_uint(0, 32)
-                    .store_slice("Your jettons were returned, check your balance")
+                    ;; .store_uint(0, 32)
+                    ;; .store_slice("Your jettons were returned, check your balance")
                   .end_cell();
         send_raw_message(msg_2, 128 + 32);
         
