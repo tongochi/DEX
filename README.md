@@ -13,7 +13,8 @@ lockup NFT collection and backend of <a href="https://api.tongochi.org/staking">
 
 Directory with all smart contracts. It includes:
 
-- **lockup_collection_1.fc** and **lockup_collection_2.fc** - two versions of the main contract (second has onchain rewards).
+- **lockup_collection_1.fc** and **lockup_collection_2.fc** - two versions of the main contract (second has onchain
+  rewards).
 
 - **nft_item.fc** - contract of NFT item from lockup NFT collection.
 
@@ -40,18 +41,22 @@ Directory with Django app that implements rest api.
 
 ### Lockup contracts info
 
-This smart contract implements locking up TON jettons for a variable or fixed periods. It is based on the [NFT collection template](https://github.com/ton-blockchain/token-contract/tree/main/nft) 
-from ton.org with the addition of handling custom opcodes and sections in storage. You can lock 
+This smart contract implements locking up TON jettons for a variable or fixed periods. It is based on
+the [NFT collection template](https://github.com/ton-blockchain/token-contract/tree/main/nft)
+from ton.org with the addition of handling custom opcodes and sections in storage. You can lock
 only one jetton type per smart contract instance.
 
-While the first version of the smart contract only implies blocking funds for the time specified when sending them, the second version supports accrual of interest on deposits. The interest rate depends on the period of blocking funds (allowable periods and the corresponding rates are specified in the form of a dictionary during contract deployment).
+While the first version of the smart contract only implies blocking funds for the time specified when sending them, the
+second version supports accrual of interest on deposits. The interest rate depends on the period of blocking funds (
+allowable periods and the corresponding rates are specified in the form of a dictionary during contract deployment).
 
+We verify all our smart contracts using verifier.ton.org so users can be sure of their reliability.
 
 ### Contract work pattern
 
 **To lock your tokens, you need:**
 
-- Deploy the contract (you can find out more info about state init parameters in smc code. For version with onchain 
+- Deploy the contract (you can find out more info about state init parameters in smc code. For version with onchain
   rewards note that royalty params have the custom structure)
 
 - Find the jetton wallet address of the contract. You can get this by sending any amount of jettons to the contract and
@@ -61,7 +66,8 @@ While the first version of the smart contract only implies blocking funds for th
   changeJettonAddress script). This variable contains the address of the jetton wallet, in which locked jettons will be
   stored.
 
-- If you are using the version with on-chain rewards, then replanish the reward pool with the amount you need (you can use
+- If you are using the version with on-chain rewards, then replanish the reward pool with the amount you need (you can
+  use
   the addRewards script).
 
 - Send jettons to the contract with msgValue and fwdAmount greater than 0.1 TON (you can use the lockTokens script)
@@ -78,7 +84,7 @@ times and amount of locked jettons are stored on-chain in the NFT-item contract 
   returnTokens script)
 
 The NFT collection contract will check that you sent a valid NFT and that the lock period has ended. If everything
-checks out, the tokens will be returned to your wallet and the NFT will be burned. In the version with on-chain 
+checks out, the tokens will be returned to your wallet and the NFT will be burned. In the version with on-chain
 rewards, you will receive <code>staking_factor / staking_base</code> jettons in addition to locked ones.
 
 #### Special features
@@ -98,18 +104,22 @@ rewards, you will receive <code>staking_factor / staking_base</code> jettons in 
   previous owner address and new owner address, **which is extremely useful** for tracking all transactions of NFTs from
   one collection.
 
-- **Low gas fees:** approximately 0.125 TON for staking and 0.04 TON for unstaking in the latest version of the contract.
+- **Low gas fees:** approximately 0.125 TON for staking and 0.04 TON for unstaking in the latest version of the
+  contract.
 
 ### Monetization
 
-Our smart contracts allow locking any tokens, so we plan to make our site a place where anyone can create a staking pool 
-with on-chain rewards. In return, we will charge royalties in the form of a percentage of the rewards allocated by the 
-project for stakers, as well as a percentage of the TVL of the pool. When creating a smart contract, royalty parameters can
-be configured, so the percentage fee will depend on the total amount of funds that the project Will allocate for user
+Our smart contracts allow locking any tokens, so we plan to make our site a place where anyone can create a staking pool
+with on-chain rewards. In return, we will charge royalties in the form of a percentage of the rewards allocated by the
+project for stakers, as well as a percentage of the TVL of the pool. When creating a smart contract, royalty parameters
+can be configured, so the percentage fee will depend on the total amount of funds that the project Will allocate for user
 rewards. All fees will be collected from the fees pool, which the project must replenish before launching the staking
-program. We will distribute 50% of our income among [NFT Tongochi Zone](https://getgems.io/collection/EQApGxeI3NnmmSGpa0DdMfj_MXH0fC7E94nJrejYSsO-qrgk) holders.
+program. We will distribute 50% of our income
+among [NFT Tongochi Zones](https://getgems.io/collection/EQApGxeI3NnmmSGpa0DdMfj_MXH0fC7E94nJrejYSsO-qrgk) holders.
 
-We have already partnered with our first client - Lave Foundation, whose staking pool TVL currently exceeds $16,000 (however, they use our previous version of the smart contract, with a fixed lockup period. It contains a minor bug that increases fees by 0.03 TON).
+We have already partnered with our first client - Lave Foundation, whose staking pool TVL currently exceeds $16,000 (
+however, they use our previous version of the smart contract, with a fixed lockup period. It contains a minor bug that
+increases fees by 0.03 TON).
 
 ### Off-chain rewards
 
@@ -119,7 +129,7 @@ from +3, there is a chance the item will be destroyed during improvement (even N
 Items level +5 and above, when destroyed, go into a database where players can retrieve them using a developer coupon.
 This database stores the last 100 broken +5 level items from all Tongochi players, on a first-in-first-out basis.
 
-Developer coupons are earned by staking PET or LP PET-TON jettons on the Tongochi staking page or using the Tongochi 
+Developer coupons are earned by staking PET or LP PET-TON jettons on the Tongochi staking page or using the Tongochi
 swapper. Users receive developer points for these actions that can be exchanged for a coupon.
 
 ### Website backend
