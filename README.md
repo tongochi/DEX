@@ -40,10 +40,12 @@ Directory with Django app that implements rest api.
 
 ### Lockup contracts info
 
-This smart contract implements locking up TON jettons for a variable or fixed period (for version with onchain rewards 
-only fixed). It is based on the [NFT collection template](https://github.com/ton-blockchain/token-contract/tree/main/nft) 
-from ton.org with the addition of handling custom opcodes and a "jetton wallet address" section in storage. You can lock 
+This smart contract implements locking up TON jettons for a variable or fixed periods. It is based on the [NFT collection template](https://github.com/ton-blockchain/token-contract/tree/main/nft) 
+from ton.org with the addition of handling custom opcodes and sections in storage. You can lock 
 only one jetton type per smart contract instance.
+
+While the first version of the smart contract only implies blocking funds for the time specified when sending them, the second version supports accrual of interest on deposits. The interest rate depends on the period of blocking funds (allowable periods and the corresponding rates are specified in the form of a dictionary during contract deployment).
+
 
 ### Contract work pattern
 
@@ -83,7 +85,7 @@ rewards, you will receive <code>staking_factor / staking_base</code> jettons in 
 
 - **Ability to lock any tokens** (tokens with different addresses should be locked in different contract instances).
 
-- **On-chain rewards** with a fixed interest rate.
+- **On-chain rewards** with different interest rates in one smart contract instance at the same time.
 
 - **Storing NFT content on-chain**, while duplicating it off-chain, so users can see it in Tonkeeper or Getgems but also
   be assured it cannot be modified.
@@ -96,6 +98,8 @@ rewards, you will receive <code>staking_factor / staking_base</code> jettons in 
   previous owner address and new owner address, **which is extremely useful** for tracking all transactions of NFTs from
   one collection.
 
+- **Low gas fees:** approximately 0.125 TON for staking and 0.04 TON for unstaking in the latest version of the contract.
+
 ### Monetization
 
 Our smart contracts allow locking any tokens, so we plan to make our site a place where anyone can create a staking pool 
@@ -103,7 +107,9 @@ with on-chain rewards. In return, we will charge royalties in the form of a perc
 project for stakers, as well as a percentage of the TVL of the pool. When creating a smart contract, royalty parameters can
 be configured, so the percentage fee will depend on the total amount of funds that the project Will allocate for user
 rewards. All fees will be collected from the fees pool, which the project must replenish before launching the staking
-program. We are able to withdraw royalty jettons right after fees pool was refilled.
+program. We will distribute 50% of our income among [NFT Tongochi Zone](https://getgems.io/collection/EQApGxeI3NnmmSGpa0DdMfj_MXH0fC7E94nJrejYSsO-qrgk) holders.
+
+We have already partnered with our first client - Lave Foundation, whose staking pool TVL currently exceeds $16,000 (however, they use our previous version of the smart contract, with a fixed lockup period. It contains a minor bug that increases fees by 0.03 TON).
 
 ### Off-chain rewards
 
