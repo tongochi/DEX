@@ -158,7 +158,7 @@ developer points each time they use it.
 - Improvement of the website's frontend.
 - Signing partnerships with more jettons.
 - Adding an interface for creating your own staking pool.
-- Adding y to withdraw funds before the end of the lockup period for a fee.
+- Adding ability to withdraw funds before the end of the lockup period for a fee.
 - Adding different reward options, e.g. NFTs.
 
 ## Links
